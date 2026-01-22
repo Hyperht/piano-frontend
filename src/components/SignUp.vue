@@ -173,7 +173,6 @@ const register = async () => {
       password: password.value,
     });
 
-    console.log("Registration successful:", response.data);
     router.push("/login");
   } catch (err) {
     if (err.response && err.response.data) {

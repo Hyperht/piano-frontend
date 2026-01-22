@@ -51,11 +51,9 @@ const fetchSearchResults = async (currentQuery) => {
       apiQuery.search = apiQuery.q;
       delete apiQuery.q;
     }
-    console.log('Fetching products with query:', apiQuery);
     const response = await axios.get(getApiUrl('products/'), {
       params: apiQuery,
     });
-    console.log('API Response:', response.data);
     // Normalize response: always set products.value to an array
     let items = [];
     if (Array.isArray(response.data)) {
@@ -117,11 +115,9 @@ watch(
   (newQuery) => {
     // The main search query may come as 'q' (legacy) or 'search' (backend expects this)
     searchQuery.value = newQuery.q || newQuery.search || '';
-    console.log('Route query changed:', newQuery);
     
     // If no search query and no filters, fetch all products
     if (!newQuery.q && !newQuery.search && Object.keys(newQuery).length === 0) {
-      console.log('No query parameters, fetching all products');
       fetchSearchResults({});
     } else {
       // Normalize query keys for the backend: ensure 'search' is used

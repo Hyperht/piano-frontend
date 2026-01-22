@@ -116,7 +116,7 @@ const routes = [
   {
     path: "/orders",
     name: "Orders",
-    
+
     component: Orders,
     meta: { requiresAuth: true },
   },
@@ -138,6 +138,18 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
+});
+
+// Authentication guard - redirect unauthenticated users to login
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem("access_token");
+
+  if (to.meta.requiresAuth && !token) {
+    // Redirect to login with the intended destination
+    next({ name: "Login", query: { redirect: to.fullPath } });
+  } else {
+    next();
+  }
 });
 
 export default router;
