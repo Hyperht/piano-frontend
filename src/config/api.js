@@ -6,7 +6,7 @@ export const API_CONFIG = {
   //BASE_URL: "http://127.0.0.1:8080/api",
   // Alternative URLs for different environments
   // BASE_URL: 'http://localhost:8080/api',
-   BASE_URL: 'http://127.0.0.1:8080/api',
+  BASE_URL: import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8080/api",
 };
 
 // Helper function to get the full API URL (Used for manual URL creation if needed)
@@ -54,7 +54,7 @@ api.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 // 3. Export the instantiated client as the default export.

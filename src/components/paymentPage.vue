@@ -145,7 +145,6 @@ onMounted(async () => {
 // --- HANDLERS ---
 const selectPaymentMethod = (method) => {
   selectedPaymentMethod.value = method;
-  console.log(`Payment method selected: ${method}`);
 };
 
 const placeOrder = () => {
@@ -189,7 +188,6 @@ const placeOrder = () => {
         };
 
         const checkoutResp = await api.post("checkout/", payload);
-        console.log("Checkout response:", checkoutResp.data);
         // Use i18n for toast messages
         toast.success(t("payment.toast_success"));
 

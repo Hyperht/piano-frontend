@@ -220,8 +220,7 @@ const updatePriceFromSlider = (type) => {
     sliderMaxPosition.value = (sliderMax.value / maxPriceLimit.value) * 100;
   }
 
-  // Debug: show slider -> price mappings
-  console.debug('[FilterSidebar] Slider changed', { type, sliderMin: sliderMin.value, sliderMax: sliderMax.value, priceRange: priceRange.value });
+  // Debug logging removed for production
 };
 
 // Watch for changes in price inputs to update sliders
@@ -246,16 +245,12 @@ const fetchFilterOptions = async () => {
   // --- 1. Fetch Categories ---
   try {
     const categoriesResponse = await axios.get(getApiUrl('categories/'));
-    
-    // Logging the response to debug category structure/data
-    console.log('Categories API Response Data:', categoriesResponse.data);
 
     // Robustly check for array structure (direct array or paginated results)
     if (Array.isArray(categoriesResponse.data)) {
         categories.value = categoriesResponse.data;
     } else if (categoriesResponse.data && Array.isArray(categoriesResponse.data.results)) {
         categories.value = categoriesResponse.data.results;
-        console.warn('Categories extracted from results property (API seems paginated).');
     } else {
         console.error('Categories API did not return a recognizable array structure.');
         categories.value = [];
@@ -273,14 +268,12 @@ const fetchFilterOptions = async () => {
   // --- 2. Fetch Colors from backend ---
   try {
     const colorsResponse = await axios.get(getApiUrl('colors/'));
-    console.log('Colors API Response Data:', colorsResponse.data);
 
     let rawColors = [];
     if (Array.isArray(colorsResponse.data)) {
       rawColors = colorsResponse.data;
     } else if (colorsResponse.data && Array.isArray(colorsResponse.data.results)) {
       rawColors = colorsResponse.data.results;
-      console.warn('Colors extracted from results property (API seems paginated).');
     } else {
       console.error('Colors API did not return a recognizable array structure.');
       rawColors = [];
@@ -304,7 +297,6 @@ const fetchFilterOptions = async () => {
 const applyFilters = () => {
   // If categories aren't loaded yet, allow applying other filters; only block when user explicitly selected categories
   if (selectedCategories.value.length > 0 && categories.value.length === 0) {
-    console.log(t('filter.category_not_loaded')); // Use translated console log
     return;
   }
 
@@ -342,14 +334,11 @@ const applyFilters = () => {
     newQuery['rating'] = selectedRatings.value.join(',');
   }
 
-  // Debug: show the exact filter payload emitted
-  console.debug('[FilterSidebar] Emitting filter changes:', newQuery);
   emit('filter-changed', newQuery);
 };
 
 // Function to clear all filter selections and apply
 const clearFilters = async () => {
-  console.debug('[FilterSidebar] clearFilters clicked — resetting local filter state');
   selectedSort.value = 'default';
   priceRange.value = { min: null, max: null };
   selectedCategories.value = [];
@@ -358,14 +347,11 @@ const clearFilters = async () => {
 
   // Deterministic clear: navigate to Search with empty query and emit an empty filter payload after navigation completes
   try {
-    console.debug('[FilterSidebar] Clearing filters — navigating to Search (awaiting navigation)');
     await router.push({ name: 'Search', query: {} });
     await nextTick();
-    console.debug('[FilterSidebar] Navigation complete, current route.query:', route.query);
     // emit empty filters so parent can react if it prefers (some flows rely on the event)
     emit('filter-changed', {});
   } catch (e) {
-    console.debug('[FilterSidebar] clearFilters navigation failed, falling back to emit only', e);
     emit('filter-changed', {});
   }
 };
@@ -393,16 +379,14 @@ const removeFilter = async (filterType, value) => {
       break;
   }
 
-  // If categories are cleared by this user action, make sure we navigate off the category route
   if (filterType === 'category' && selectedCategories.value.length === 0) {
     try {
       if (route.name === 'CategoryPage' || route.name === 'SubCategoryPage') {
-        console.debug('[FilterSidebar] Categories cleared via removeFilter — navigating to Search (awaiting navigation)');
         await router.push({ name: 'Search', query: {} });
         return;
       }
     } catch (e) {
-      console.debug('[FilterSidebar] removeFilter navigation failed', e);
+      // Navigation failed, continue with filter application
     }
   }
 
@@ -543,24 +527,14 @@ watch(
   () => categories.value,
   (newCategories) => {
     if (newCategories.length > 0 && route.params.categoryName) {
-      console.log('Categories loaded, checking for route param:', route.params.categoryName);
       // Find the category from route params and add it to selection
       const categoryFromRoute = newCategories.find(cat => 
         cat.name.toLowerCase() === route.params.categoryName.toLowerCase()
       );
-      console.log('Found category from route:', categoryFromRoute);
       if (categoryFromRoute && !selectedCategories.value.includes(categoryFromRoute.id)) {
-        console.log('Adding category to selection:', categoryFromRoute.id);
         selectedCategories.value.push(categoryFromRoute.id);
         // Don't apply filters here - let ProductListPage handle the API call
         // The ProductListPage will handle the initial API call with the route param
-      }
-      
-      // Also handle subcategory case
-      if (route.params.subCategoryName) {
-        console.log('Subcategory route param detected:', route.params.subCategoryName);
-        // The parent category should already be added above
-        // This ensures the parent category is checked when viewing a subcategory
       }
     }
   },
@@ -577,7 +551,6 @@ watch(
       const selectedCategory = categories.value.find(cat => cat.id === selectedCategoryId);
       
       if (selectedCategory) {
-        console.log('Navigating to category:', selectedCategory.name);
         // Navigate to the category page
         router.push({
           name: 'CategoryPage',

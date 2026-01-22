@@ -154,8 +154,6 @@ const login = async () => {
       password: password.value,
     });
 
-    console.log("Login successful!", response.data);
-
     // Persist tokens
     localStorage.setItem("access_token", response.data.access);
     localStorage.setItem("refresh_token", response.data.refresh);

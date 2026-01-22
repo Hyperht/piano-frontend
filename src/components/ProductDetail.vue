@@ -222,9 +222,6 @@ const authStore = useAuthStore();
 const cartStore = useCartStore();
 const toast = useToast();
 const { t, locale } = useI18n();
-console.log('LOCALE:', locale.value);
-console.log('EN choose_color:', t('product.choose_color'));
-console.log('ACTIVE LOCALE:', locale.value)
 
 // Helper to pick a localized field (handles { en: '', ar: '' } shapes or name_en / name_ar)
 // Also looks up `products.{slug}.{field}` in locale files as a frontend override.
@@ -315,7 +312,6 @@ const fetchProduct = async (id) => {
     
     const response = await axios.get(getApiUrl(`products/${id}/`), { headers });
     product.value = response.data;
-    console.log("PRODUCT FROM API:", response.data);
 
     // Initialize defaults
     if (product.value.colors && product.value.colors.length > 0) {
@@ -405,11 +401,7 @@ watch(locale, (newLocale, oldLocale) => {
 });
 
 onMounted(() => {
-  try {
-    console.debug("[i18n debug] locale:", locale.value, "choose_color =>", t('product.choose_color'));
-  } catch (e) {
-    console.debug("[i18n debug] failed to read translation:", e);
-  }
+  // Initialization complete
 });
 
 // --- Add to Cart handler (ProductSlider style) ---

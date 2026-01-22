@@ -82,7 +82,6 @@ const pageTitle = computed(() => {
 const fetchCategories = async () => {
   try {
     const response = await axios.get(getApiUrl('categories/'));
-    console.log('Categories API Response:', response.data);
     
     if (Array.isArray(response.data)) {
       categories.value = response.data;
@@ -90,23 +89,10 @@ const fetchCategories = async () => {
       categories.value = response.data.results;
     }
     
-    // Debug: Log the categories structure
-    console.log('Categories loaded:', categories.value);
-    categories.value.forEach(cat => {
-      console.log(`Category: ${cat.name} (ID: ${cat.id})`);
-      if (cat.subcategories) {
-        console.log(`  Subcategories:`, cat.subcategories);
-      } else {
-        console.log(`  No subcategories found`);
-      }
-    });
-    
     // Try to fetch subcategories separately if they're not included
     if (categories.value.length > 0 && !categories.value[0].subcategories) {
-      console.log('No subcategories found in categories, trying to fetch separately...');
       try {
         const subcategoriesResponse = await axios.get(getApiUrl('subcategories/'));
-        console.log('Subcategories API Response:', subcategoriesResponse.data);
         
         // Map subcategories to their parent categories
         if (Array.isArray(subcategoriesResponse.data)) {
@@ -115,7 +101,6 @@ const fetchCategories = async () => {
             category.subcategories = subcategories.filter(sub => 
               sub.parent_category && sub.parent_category.id === category.id
             );
-            console.log(`Mapped subcategories for ${category.name}:`, category.subcategories);
           });
         }
       } catch (subError) {
@@ -147,11 +132,9 @@ const fetchProducts = async (query, immediate = false) => {
 const performFetch = async (query) => {
   loading.value = true;
   try {
-    console.log('Fetching products with query:', query);
     const response = await axios.get(getApiUrl('products/'), {
       params: query,
     });
-    console.log('API Response:', response.data);
     
     // Handle different response formats
     if (Array.isArray(response.data)) {
@@ -216,9 +199,6 @@ watch(
     
     // Dynamically add category and subcategory filters from route parameters
     if (newParams.subCategoryName) {
-      console.log('Subcategory route param:', newParams.subCategoryName);
-      console.log('Parent category param:', newParams.categoryName);
-      
       // Clear any existing category filters when filtering by subcategory
       delete apiQuery['category__name'];
       delete apiQuery['category'];
@@ -230,51 +210,29 @@ watch(
       const parentCategory = categories.value.find(cat => 
         cat.name.toLowerCase() === newParams.categoryName.toLowerCase()
       );
-      console.log('Found parent category:', parentCategory);
       
       if (parentCategory && parentCategory.subcategories) {
-        console.log('Parent category subcategories:', parentCategory.subcategories);
         const subcategory = parentCategory.subcategories.find(sub => {
           const subName = sub.name ? sub.name.toLowerCase().trim() : '';
           const paramName = newParams.subCategoryName.toLowerCase().trim();
-          console.log(`Comparing subcategory: "${subName}" with param: "${paramName}"`);
           
           // Try exact match first
-          if (subName === paramName) {
-            console.log('Exact match found');
-            return true;
-          }
+          if (subName === paramName) return true;
           
           // Try contains match
-          if (subName.includes(paramName) || paramName.includes(subName)) {
-            console.log('Contains match found');
-            return true;
-          }
+          if (subName.includes(paramName) || paramName.includes(subName)) return true;
           
           // Try word boundary match for better accuracy
           const subWords = subName.split(/\s+/);
           const paramWords = paramName.split(/\s+/);
-          const hasWordMatch = subWords.some(word => 
+          return subWords.some(word => 
             paramWords.some(paramWord => word.includes(paramWord) || paramWord.includes(word))
           );
-          
-          if (hasWordMatch) {
-            console.log('Word boundary match found');
-            return true;
-          }
-          
-          console.log('No match found');
-          return false;
         });
-        console.log('Found subcategory:', subcategory);
         if (subcategory) {
           apiQuery['subcategory'] = subcategory.id.toString();
           apiQuery['category'] = parentCategory.id.toString();
-          console.log('Added subcategory ID to query:', subcategory.id);
-          console.log('Final API query for subcategory:', apiQuery);
         }
-      } else {
-        console.log('No subcategories found for parent category or parent category not found');
       }
     } else if (newParams.categoryName) {
       apiQuery['category__name'] = newParams.categoryName;
@@ -293,7 +251,6 @@ watch(
       delete apiQuery.q;
     }
     
-    console.log('ProductListPage - fetching with query:', apiQuery);
     fetchProducts(apiQuery, true); // Immediate fetch for route changes
   },
   { immediate: false }
@@ -311,9 +268,6 @@ onMounted(async () => {
   
   // Add route parameters
   if (route.params.subCategoryName) {
-    console.log('Initial subcategory route param:', route.params.subCategoryName);
-    console.log('Initial parent category param:', route.params.categoryName);
-    
     // Clear any existing category filters when filtering by subcategory
     delete apiQuery['category__name'];
     delete apiQuery['category'];
@@ -325,51 +279,29 @@ onMounted(async () => {
     const parentCategory = categories.value.find(cat => 
       cat.name.toLowerCase() === route.params.categoryName.toLowerCase()
     );
-    console.log('Initial found parent category:', parentCategory);
     
     if (parentCategory && parentCategory.subcategories) {
-      console.log('Initial parent category subcategories:', parentCategory.subcategories);
       const subcategory = parentCategory.subcategories.find(sub => {
         const subName = sub.name ? sub.name.toLowerCase().trim() : '';
         const paramName = route.params.subCategoryName.toLowerCase().trim();
-        console.log(`Initial comparing subcategory: "${subName}" with param: "${paramName}"`);
         
         // Try exact match first
-        if (subName === paramName) {
-          console.log('Initial exact match found');
-          return true;
-        }
+        if (subName === paramName) return true;
         
         // Try contains match
-        if (subName.includes(paramName) || paramName.includes(subName)) {
-          console.log('Initial contains match found');
-          return true;
-        }
+        if (subName.includes(paramName) || paramName.includes(subName)) return true;
         
         // Try word boundary match for better accuracy
         const subWords = subName.split(/\s+/);
         const paramWords = paramName.split(/\s+/);
-        const hasWordMatch = subWords.some(word => 
+        return subWords.some(word => 
           paramWords.some(paramWord => word.includes(paramWord) || paramWord.includes(word))
         );
-        
-        if (hasWordMatch) {
-          console.log('Initial word boundary match found');
-          return true;
-        }
-        
-        console.log('Initial no match found');
-        return false;
       });
-      console.log('Initial found subcategory:', subcategory);
       if (subcategory) {
         apiQuery['subcategory'] = subcategory.id.toString();
         apiQuery['category'] = parentCategory.id.toString();
-        console.log('Initial added subcategory ID to query:', subcategory.id);
-        console.log('Initial final API query for subcategory:', apiQuery);
       }
-    } else {
-      console.log('Initial: No subcategories found for parent category or parent category not found');
     }
   } else if (route.params.categoryName) {
     apiQuery['category__name'] = route.params.categoryName;
@@ -388,7 +320,6 @@ onMounted(async () => {
     delete apiQuery.q;
   }
   
-  console.log('Initial fetch with query:', apiQuery);
   fetchProducts(apiQuery, true);
 });
 </script>

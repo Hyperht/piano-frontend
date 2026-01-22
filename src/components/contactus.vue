@@ -74,7 +74,6 @@ const handleSubmit = async () => {
     });
 
     if (response.ok) {
-      console.log('Contact Form Submitted:', form);
       alert('Thank you for your message!');
       // Reset form
       form.fullName = '';
