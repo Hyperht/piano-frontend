@@ -3,10 +3,7 @@ import axios from "axios";
 // --- API Configuration ---
 // Change this URL to match your backend server
 export const API_CONFIG = {
-  //BASE_URL: "http://127.0.0.1:8080/api",
-  // Alternative URLs for different environments
-  // BASE_URL: 'http://localhost:8080/api',
-  BASE_URL: import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8080/api",
+  BASE_URL: import.meta.env.VITE_API_BASE_URL || "/api",
 };
 
 // Helper function to get the full API URL (Used for manual URL creation if needed)
