@@ -17,6 +17,30 @@
         </svg>
         {{ $t("filter.title") }} </h3>
       <button @click="clearFilters" class="clear-filters-btn">{{ $t("filter.clear_btn") }}</button> </div>
+      
+      <!-- Mobile Toggle -->
+      <div class="mobile-filter-toggle">
+        <button @click="isExpanded = !isExpanded" class="toggle-btn">
+          {{ isExpanded ? $t('filter.hide_filters') : $t('filter.show_filters') }}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            :class="{ 'rotated': isExpanded }"
+          >
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+      </div>
+
+    <div v-show="isExpanded || !isMobile" class="filter-content">
+      <div v-if="isLoading" class="loading-state">
 
     <div v-if="isLoading" class="loading-state">
       <p>{{ $t("filter.loading") }}</p> </div>
@@ -128,6 +152,7 @@
           </label>
         </div>
       </div>
+      </div>
     </div>
   </div>
 </template>
@@ -186,6 +211,20 @@ const toast = useToast(); // Initialize toast
 // Using centralized API configuration
 
 const isLoading = ref(false);
+const isExpanded = ref(false); // Mobile toggle state
+const isMobile = ref(false); // Mobile detection
+
+// Check for mobile on mount and resize
+const checkMobile = () => {
+  isMobile.value = window.innerWidth <= 992;
+  if (!isMobile.value) isExpanded.value = true;
+};
+
+onMounted(() => {
+  checkMobile();
+  window.addEventListener('resize', checkMobile);
+  fetchFilterOptions();
+});
 
 const selectedSort = ref('default');
 const priceRange = ref({ min: null, max: null });
@@ -778,5 +817,47 @@ onMounted(() => {
  padding: 1rem;
  border: 1px dashed #ccc;
  border-radius: 5px;
+}
+
+/* Responsive Styles */
+.mobile-filter-toggle {
+  display: none;
+  margin-bottom: 1rem;
+}
+
+.toggle-btn {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.toggle-btn svg {
+  transition: transform 0.3s ease;
+}
+
+.toggle-btn svg.rotated {
+  transform: rotate(180deg);
+}
+
+@media (max-width: 992px) {
+  .filter-sidebar {
+    width: 100%;
+    min-width: unset;
+  }
+  
+  .mobile-filter-toggle {
+    display: block;
+  }
+  
+  .filter-header {
+    margin-bottom: 0.5rem;
+  }
 }
 </style>

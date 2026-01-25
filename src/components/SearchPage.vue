@@ -157,4 +157,16 @@ watch(
   color: #888;
   margin-top: 2rem;
 }
+
+@media (max-width: 992px) {
+  .search-page-container {
+    padding: 0 1rem;
+    margin: 1rem auto;
+  }
+
+  .main-content {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
 </style>
