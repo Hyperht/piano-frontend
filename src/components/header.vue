@@ -1,6 +1,15 @@
 <template>
   <header class="main-header">
     <div class="header-top">
+      <!-- NEW: Hamburger Button for Mobile -->
+      <button class="hamburger-btn" @click="isMobileMenuOpen = true">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
       <div class="logo-container">
         <router-link to="/" class="logo">
           <img :src="logo" :alt="$t('header.logo_alt')" />
@@ -194,6 +203,51 @@
   <ProfileSidebar v-model:isVisible="isProfileSidebarOpen" />
 
   <CartSidebar :isOpen="isCartOpen" @close="isCartOpen = false" />
+
+  <!-- NEW: Mobile Menu Drawer -->
+  <div class="mobile-menu-overlay" v-if="isMobileMenuOpen" @click="isMobileMenuOpen = false"></div>
+  <aside class="mobile-menu" :class="{ open: isMobileMenuOpen }">
+    <div class="mobile-menu-header">
+      <h3>{{ $t('header.menu') || 'Menu' }}</h3>
+      <button class="close-menu-btn" @click="isMobileMenuOpen = false">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+    <div class="mobile-menu-content">
+      <ul class="mobile-categories-list">
+        <li v-for="category in categories" :key="category.id" class="mobile-category-item">
+            <div class="mobile-category-header">
+                <router-link
+                :to="{
+                    name: 'CategoryPage',
+                    params: { categoryName: category.name.toLowerCase() },
+                }"
+                @click="isMobileMenuOpen = false"
+                >
+                {{ localizedName(category) }}
+                </router-link>
+            </div>
+            <!-- Subcategories -->
+            <ul v-if="category.subcategories && category.subcategories.length > 0" class="mobile-subcategories">
+                <li v-for="sub in category.subcategories" :key="sub.id">
+                    <router-link
+                    :to="{
+                        name: 'SubCategoryPage',
+                        params: {
+                            categoryName: category.name.toLowerCase(),
+                            subCategoryName: sub.name.toLowerCase(),
+                        },
+                    }"
+                    @click="isMobileMenuOpen = false"
+                    >
+                    - {{ localizedName(sub) }}
+                    </router-link>
+                </li>
+            </ul>
+        </li>
+      </ul>
+    </div>
+  </aside>
 </template>
 
 <script setup>
@@ -242,6 +296,7 @@ const userName = computed(() => {
 
 const isCartOpen = ref(false);
 const isProfileSidebarOpen = ref(false);
+const isMobileMenuOpen = ref(false); // NEW: Mobile menu state
 const cartCount = ref(0);
 
 // Language / translate support
@@ -700,5 +755,167 @@ onMounted(() => {
   font-weight: bold;
   border: 1px solid rgba(255, 255, 255, 0.5);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Responsive Styles --- */
+.hamburger-btn {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  margin-right: 1rem;
+}
+
+[dir="rtl"] .hamburger-btn {
+  margin-right: 0;
+  margin-left: 1rem;
+}
+
+.mobile-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 2000;
+}
+
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 280px;
+  height: 100%;
+  background: #fff;
+  z-index: 2001;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+[dir="rtl"] .mobile-menu {
+  left: auto;
+  right: 0;
+  transform: translateX(100%);
+}
+
+.mobile-menu.open {
+  transform: translateX(0);
+}
+
+.mobile-menu-header {
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+}
+
+.mobile-menu-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.close-menu-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.mobile-menu-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+.mobile-categories-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.mobile-category-item {
+  margin-bottom: 1rem;
+}
+
+.mobile-category-header a {
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #333;
+  text-decoration: none;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.mobile-subcategories {
+  list-style: none;
+  padding-left: 1rem;
+  margin: 0;
+}
+
+[dir="rtl"] .mobile-subcategories {
+  padding-left: 0;
+  padding-right: 1rem;
+}
+
+.mobile-subcategories li a {
+  color: #666;
+  text-decoration: none;
+  display: block;
+  padding: 0.2rem 0;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 992px) {
+  .hamburger-btn {
+    display: block;
+  }
+
+  .header-bottom-wrapper {
+    display: none; /* Hide desktop nav */
+  }
+  
+  .header-top {
+    padding: 0.5rem 1rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .search-bar {
+    order: 3; /* Move search to bottom row on mobile */
+    width: 100%;
+    margin: 0;
+    max-width: none;
+  }
+  
+  .logo-container {
+    margin-right: auto; 
+  }
+  
+  [dir="rtl"] .logo-container {
+    margin-right: 0;
+    margin-left: auto;
+  }
+  
+  .user-actions {
+    gap: 0.8rem;
+  }
+  
+  .user-actions span {
+    display: none; /* Hide text labels in user actions on mobile, show only icons if desired */
+  }
+  
+  .cart-count-badge {
+    top: -8px;
+    right: -8px;
+    width: 18px;
+    height: 18px;
+    font-size: 0.8rem;
+  }
 }
 </style>

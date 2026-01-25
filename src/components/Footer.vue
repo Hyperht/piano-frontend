@@ -214,6 +214,12 @@ import logoImage from "@/assets/0 15.png";
   font-family: Arial, sans-serif;
 }
 
+@media (max-width: 768px) {
+  .main-footer {
+    padding: 2rem 1rem;
+  }
+}
+
 .footer-top {
   display: flex;
   justify-content: space-between;

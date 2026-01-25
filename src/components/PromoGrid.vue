@@ -221,4 +221,27 @@ onMounted(() => {
   text-align: center;
   color: white;
 }
+
+@media (max-width: 768px) {
+  .grid-container {
+    flex-direction: column;
+    height: auto;
+    aspect-ratio: unset;
+    overflow-x: visible;
+  }
+
+  .column {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .field {
+    min-height: 200px;
+  }
+
+  .field-long, .field-short {
+    height: 200px;
+  }
+}
 </style>
+```

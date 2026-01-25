@@ -1,0 +1,57 @@
+/* Global Vars */
+:root {
+  --primary-color: #3b827e;
+  --secondary-color: #20b486;
+  --text-color: #333;
+  --bg-color: #f9f9f9;
+  --header-height: 80px;
+}
+
+/* Basic Reset */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+  color: var(--text-color);
+  background-color: var(--bg-color);
+  overflow-x: hidden; /* Prevent horizontal scroll on small screens */
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Utility Classes */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  :root {
+    --header-height: 60px;
+  }
+}

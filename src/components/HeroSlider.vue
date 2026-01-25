@@ -145,4 +145,27 @@ onUnmounted(() => clearInterval(intervalId));
 .dots-container { display: flex; justify-content: center; margin-top: 1rem; gap: 10px; }
 .dot { width: 12px; height: 12px; background: #ccc; border-radius: 50%; cursor: pointer; }
 .dot.active { background: #007bff; width: 30px; border-radius: 10px; }
-</style>style>
+
+@media (max-width: 768px) {
+  .slide {
+    height: 300px;
+  }
+  
+  .slide-content h1 {
+    font-size: 1.8rem;
+  }
+  
+  .slide-content p {
+    font-size: 1rem;
+  }
+  
+  .slide-content {
+    left: 5%;
+    max-width: 90%;
+  }
+  
+  [dir="rtl"] .slide-content {
+    right: 5%;
+  }
+}
+</style>
