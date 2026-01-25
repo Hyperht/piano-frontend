@@ -41,9 +41,7 @@
 
     <div v-show="isExpanded || !isMobile" class="filter-content">
       <div v-if="isLoading" class="loading-state">
-
-    <div v-if="isLoading" class="loading-state">
-      <p>{{ $t("filter.loading") }}</p> </div>
+        <p>{{ $t("filter.loading") }}</p> </div>
 
     <div v-else>
       <div class="filter-section">
