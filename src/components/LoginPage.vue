@@ -194,10 +194,11 @@ const login = async () => {
 // New social login function to work with allauth
 // New social login function to work with allauth
 const socialLogin = (provider) => {
+  console.log(`[SocialLogin] Starting login for ${provider}`);
+  
   // Use relative path to leverage the Vite proxy (defined in vite.config.js)
-  // This ensures the popup opens on the same origin (localhost:3000) as the frontend,
-  // preventing Cross-Site cookie issues.
   const authUrl = `/accounts/${provider}/login/`;
+  console.log(`[SocialLogin] Opening popup: ${authUrl}`);
   
   const authWindow = window.open(authUrl, "_blank", "width=500,height=600");
 
@@ -205,17 +206,19 @@ const socialLogin = (provider) => {
   const checkWindowClosed = setInterval(async () => {
     if (authWindow.closed) {
       clearInterval(checkWindowClosed);
+      console.log("[SocialLogin] Popup closed. Attempting session exchange...");
       
       try {
         // Exchange the session cookie (set by the popup login) for a JWT token.
-        // We MUST use withCredentials: true so the session cookie is included in the request.
-        // We use the RELATIVE path here '/api/auth/session-token/' to ensure it goes through
-        // the same proxy as the login, sharing the cookie jar.
+        console.log("[SocialLogin] Calling /api/auth/session-token/");
         const res = await axios.get("/api/auth/session-token/", {
             withCredentials: true
         });
+        
+        console.log("[SocialLogin] Response received:", res.status, res.data);
 
         if (res.data && res.data.access) {
+           console.log("[SocialLogin] Token found! Logging in...");
            // Save tokens
            localStorage.setItem("access_token", res.data.access);
            localStorage.setItem("refresh_token", res.data.refresh);
@@ -227,16 +230,20 @@ const socialLogin = (provider) => {
            
            // Fetch full user profile if needed
            if (!res.data.user) {
-              authStore.fetchUser().catch(() => {});
+              console.log("[SocialLogin] Fetching full user profile...");
+              authStore.fetchUser().catch(e => console.error("[SocialLogin] Fetch user failed", e));
            }
            
            // Redirect to home
+           console.log("[SocialLogin] Redirecting to home...");
            router.push("/");
         }
       } catch (err) {
-        console.error("Social login exchange failed", err);
+        console.error("[SocialLogin] Exchange failed", err);
+        if (err.response) {
+            console.error("[SocialLogin] Server Error:", err.response.status, err.response.data);
+        }
         // If the exchange fails, it means the session wasn't set or expired.
-        // Likely caused by the browser blocking the cookie or the user closing the popup deeply early.
       }
     }
   }, 500);
