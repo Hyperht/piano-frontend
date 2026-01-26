@@ -194,10 +194,11 @@ const login = async () => {
 // New social login function to work with allauth
 // New social login function to work with allauth
 const socialLogin = (provider) => {
-  const authUrl = `${API_CONFIG.BASE_URL.replace(
-    /\/api\/?$/,
-    ""
-  )}/accounts/${provider}/login/`;
+  // Use relative path to leverage the Vite proxy (defined in vite.config.js)
+  // This ensures the popup opens on the same origin (localhost:3000) as the frontend,
+  // preventing Cross-Site cookie issues.
+  const authUrl = `/accounts/${provider}/login/`;
+  
   const authWindow = window.open(authUrl, "_blank", "width=500,height=600");
 
   // Check if the pop-up window is closed
@@ -208,7 +209,9 @@ const socialLogin = (provider) => {
       try {
         // Exchange the session cookie (set by the popup login) for a JWT token.
         // We MUST use withCredentials: true so the session cookie is included in the request.
-        const res = await axios.get(getApiUrl("auth/session-token/"), {
+        // We use the RELATIVE path here '/api/auth/session-token/' to ensure it goes through
+        // the same proxy as the login, sharing the cookie jar.
+        const res = await axios.get("/api/auth/session-token/", {
             withCredentials: true
         });
 
@@ -222,7 +225,7 @@ const socialLogin = (provider) => {
            // Update store
            authStore.setToken(res.data.access, returnedUser);
            
-           // Fetch full user profile if needed (in case the lightweight user obj isn't enough)
+           // Fetch full user profile if needed
            if (!res.data.user) {
               authStore.fetchUser().catch(() => {});
            }
@@ -232,10 +235,8 @@ const socialLogin = (provider) => {
         }
       } catch (err) {
         console.error("Social login exchange failed", err);
-        // If the exchange fails, it means the session wasn't set or expired (e.g. user closed popup without login)
-        // We might not want to show a huge error if they just closed the popup, 
-        // but if they expected to login, this error helps.
-        // error.value = t("login.errors.social_login_failed"); 
+        // If the exchange fails, it means the session wasn't set or expired.
+        // Likely caused by the browser blocking the cookie or the user closing the popup deeply early.
       }
     }
   }, 500);
