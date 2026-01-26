@@ -192,6 +192,7 @@ const login = async () => {
 };
 
 // New social login function to work with allauth
+// New social login function to work with allauth
 const socialLogin = (provider) => {
   const authUrl = `${API_CONFIG.BASE_URL.replace(
     /\/api\/?$/,
@@ -200,11 +201,42 @@ const socialLogin = (provider) => {
   const authWindow = window.open(authUrl, "_blank", "width=500,height=600");
 
   // Check if the pop-up window is closed
-  const checkWindowClosed = setInterval(() => {
+  const checkWindowClosed = setInterval(async () => {
     if (authWindow.closed) {
       clearInterval(checkWindowClosed);
-      // Reload the page to check if the user is authenticated.
-      window.location.reload();
+      
+      try {
+        // Exchange the session cookie (set by the popup login) for a JWT token.
+        // We MUST use withCredentials: true so the session cookie is included in the request.
+        const res = await axios.get(getApiUrl("auth/session-token/"), {
+            withCredentials: true
+        });
+
+        if (res.data && res.data.access) {
+           // Save tokens
+           localStorage.setItem("access_token", res.data.access);
+           localStorage.setItem("refresh_token", res.data.refresh);
+           
+           const returnedUser = res.data.user || { email: "Social User", name: "" };
+
+           // Update store
+           authStore.setToken(res.data.access, returnedUser);
+           
+           // Fetch full user profile if needed (in case the lightweight user obj isn't enough)
+           if (!res.data.user) {
+              authStore.fetchUser().catch(() => {});
+           }
+           
+           // Redirect to home
+           router.push("/");
+        }
+      } catch (err) {
+        console.error("Social login exchange failed", err);
+        // If the exchange fails, it means the session wasn't set or expired (e.g. user closed popup without login)
+        // We might not want to show a huge error if they just closed the popup, 
+        // but if they expected to login, this error helps.
+        // error.value = t("login.errors.social_login_failed"); 
+      }
     }
   }, 500);
 };
