@@ -239,11 +239,18 @@ const socialLogin = (provider) => {
            router.push("/");
         }
       } catch (err) {
-        console.error("[SocialLogin] Exchange failed", err);
+        console.error("[SocialLogin] Exchange failed object:", err);
+        console.error("[SocialLogin] Document Cookies (visible):", document.cookie);
+        
         if (err.response) {
-            console.error("[SocialLogin] Server Error:", err.response.status, err.response.data);
+            console.error("[SocialLogin] Server Error Status:", err.response.status);
+            console.error("[SocialLogin] Server Error Data:", err.response.data);
+            console.error("[SocialLogin] Server Response Headers:", err.response.headers);
+        } else if (err.request) {
+            console.error("[SocialLogin] No response received from server. Network or CORS issue?", err.request);
+        } else {
+            console.error("[SocialLogin] Request setup error:", err.message);
         }
-        // If the exchange fails, it means the session wasn't set or expired.
       }
     }
   }, 500);
