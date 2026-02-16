@@ -20,6 +20,7 @@ export const axiosConfig = {
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true,
 };
 
 // ------------------------------------
@@ -46,6 +47,30 @@ api.interceptors.request.use(
       if (lang) config.headers["Accept-Language"] = lang;
     } catch (e) {
       // ignore in non-browser envs
+    }
+
+    // CSRF Token injection
+    if (['post', 'put', 'patch', 'delete'].includes(config.method ? config.method.toLowerCase() : 'get')) {
+      // Helper to get cookie
+      const getCookie = (name) => {
+        let cookieValue = null;
+        if (typeof document !== 'undefined' && document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      };
+
+      const csrftoken = getCookie('csrftoken');
+      if (csrftoken) {
+        config.headers['X-CSRFToken'] = csrftoken;
+      }
     }
     return config;
   },

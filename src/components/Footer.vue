@@ -63,12 +63,14 @@
         <h4>{{ $t("footer.payment_methods") }}</h4>
         <div class="payment-icons">
           <img
-            src="https://via.placeholder.com/60x40/fff/000?text=VISA"
+            src="../assets/visa.png"
             alt="Visa"
+            class="payment-icon-visa"
           />
           <img
-            src="https://via.placeholder.com/60x40/fff/000?text=MC"
+            src="../assets/master-card.png"
             alt="Mastercard"
+            class="payment-icon-mastercard"
           />
         </div>
       </div>
@@ -80,9 +82,10 @@
             href="https://play.google.com/store/apps"
             target="_blank"
             rel="noopener noreferrer"
+            class="app-link-google"
           >
             <img
-              src="https://via.placeholder.com/150x50/fff/000?text=Google+Play"
+              src="../assets/google-play.png"
               alt="Google Play"
             />
           </a>
@@ -90,9 +93,10 @@
             href="https://www.apple.com/app-store/"
             target="_blank"
             rel="noopener noreferrer"
+            class="app-link-apple"
           >
             <img
-              src="https://via.placeholder.com/150x50/fff/000?text=Apple+Store"
+              src="../assets/app-store.png"
               alt="Apple Store"
             />
           </a>
@@ -281,7 +285,22 @@ a {
 a:hover {
   text-decoration: underline;
 }
-
+.app-link-google{
+  width: 37px;
+  height: 36px;
+}
+.app-link-apple{
+  width: 37px;
+  height: 36px;
+}
+.payment-icon-mastercard{
+  width: 37px;
+  height: 36px;
+}
+.payment-icon-visa{
+  width: 37px;
+  height: 36px;
+}
 .email-link {
   font-weight: bold;
 }

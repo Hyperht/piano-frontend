@@ -62,7 +62,9 @@
   "auth": {
     "login_required_favorites": "You must be logged in to manage favorites.",
     "login_required_cart": "You must be logged in to add items to the cart.",
-    "authentication_failed": "Authentication failed. Please log in again."
+    "authentication_failed": "Authentication failed. Please log in again.",
+    "completing_login": "Completing Login...",
+    "please_wait": "Please wait while we log you in"
   },
   "cart": {
     "loading": "Loading your shopping cart...",

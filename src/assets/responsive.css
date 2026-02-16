@@ -1,0 +1,127 @@
+/* Responsive Breakpoints & Container Logic */
+
+/* XXS - Extra Extra Small (Default / < 375px) */
+/* Handled by default styles */
+
+/* XS - Extra Small (Phones < 576px) */
+@media (max-width: 575.98px) {
+  :root {
+    --container-width: 100%;
+    --spacing-lg: 1rem;
+    --spacing-xl: 1.5rem;
+  }
+  
+  .container {
+    padding: 0 0.75rem; /* Tighter padding on very small screens */
+  }
+
+  /* Utility to hide/show on mobile */
+  .d-none-xs { display: none !important; }
+  .d-block-xs { display: block !important; }
+}
+
+/* SM - Small (Tablets Portrait / Large Phones >= 576px) */
+@media (min-width: 576px) {
+  .container {
+    max-width: 540px;
+  }
+}
+
+/* MD - Medium (Tablets Landscape >= 768px) */
+@media (min-width: 768px) {
+  .container {
+    max-width: 720px;
+  }
+  
+  /* Grid utilities often needed */
+  .grid-md-2 { grid-template-columns: repeat(2, 1fr); }
+  .grid-md-3 { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* LG - Large (Laptops >= 992px) */
+@media (min-width: 992px) {
+  .container {
+    max-width: 960px;
+  }
+  
+  .grid-lg-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid-lg-4 { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* XL - Extra Large (Desktops >= 1200px) */
+@media (min-width: 1200px) {
+  .container {
+    max-width: 1140px;
+  }
+}
+
+/* XXL - Extra Extra Large (Wide Screens >= 1400px) */
+@media (min-width: 1400px) {
+  .container {
+    max-width: 1320px;
+  }
+}
+
+/* --- Global Responsive Fixes --- */
+
+/* Prevent horizontal overflow */
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+/* Flex wrapping for common layouts */
+.flex-wrap-responsive {
+  flex-wrap: wrap;
+}
+
+/* Responsive Images */
+img.responsive-img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Responsive Typography */
+@media (max-width: 768px) {
+  h1 { font-size: 1.75rem !important; }
+  h2 { font-size: 1.5rem !important; }
+  h3 { font-size: 1.25rem !important; }
+  p { font-size: 0.95rem !important; }
+}
+
+/* Responsive Table wrappers (for Orders/Admin tables) */
+.table-responsive {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Fix generic grid layouts */
+.product-grid, .category-grid {
+  display: grid;
+  gap: var(--spacing-md);
+  /* Default Mobile: 1 column */
+  grid-template-columns: 1fr; 
+}
+
+@media (min-width: 576px) {
+  .product-grid, .category-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 992px) {
+  .product-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .category-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 1200px) {
+  .product-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

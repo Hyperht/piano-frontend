@@ -307,7 +307,7 @@ const fetchProduct = async (id) => {
   loading.value = true;
   try {
     const token = authStore.token;
-    // Note: Use getApiUrl specifically ensuring it matches your Django port (8080)
+    // Note: Use getApiUrl specifically ensuring it matches your Django port (8000)
     const headers = token ? { Authorization: `Bearer ${token}` } : {};
     
     const response = await axios.get(getApiUrl(`products/${id}/`), { headers });

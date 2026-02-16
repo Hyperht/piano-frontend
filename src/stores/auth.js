@@ -1,15 +1,16 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import axios from "axios";
-import { API_CONFIG, getApiUrl } from "@/config/api";
+import api, { API_CONFIG, getApiUrl } from "@/config/api";
 
 const API_URL = API_CONFIG.BASE_URL + "/";
 
 export const useAuthStore = defineStore("auth", () => {
   const token = ref(localStorage.getItem("access_token") || null);
   const user = ref(JSON.parse(localStorage.getItem("user")) || null);
+  const isInitialized = ref(false);
 
-  const isAuthenticated = computed(() => !!token.value);
+  const isAuthenticated = computed(() => !!user.value);
   const username = computed(() => (user.value ? user.value.name : "Guest"));
 
   const setToken = (newToken, newUser) => {
@@ -18,6 +19,7 @@ export const useAuthStore = defineStore("auth", () => {
     localStorage.setItem("access_token", newToken);
     localStorage.setItem("user", JSON.stringify(newUser));
     // Set the Authorization header for all subsequent API calls
+    api.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
     axios.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
   };
 
@@ -26,6 +28,7 @@ export const useAuthStore = defineStore("auth", () => {
     user.value = null;
     localStorage.removeItem("access_token");
     localStorage.removeItem("user");
+    delete api.defaults.headers.common["Authorization"];
     delete axios.defaults.headers.common["Authorization"];
   };
 
@@ -35,6 +38,7 @@ export const useAuthStore = defineStore("auth", () => {
 
     if (storedToken) {
       token.value = storedToken;
+      api.defaults.headers.common["Authorization"] = `Bearer ${storedToken}`;
       axios.defaults.headers.common["Authorization"] = `Bearer ${storedToken}`;
     }
 
@@ -50,20 +54,19 @@ export const useAuthStore = defineStore("auth", () => {
 
   // 🚀 NEW ACTION: fetchUser
   const fetchUser = async () => {
-    if (!token.value) {
-      console.log("No token available for fetchUser.");
-      return;
-    }
+    // We try to fetch user even if no token is present in state,
+    // because we might rely on HttpOnly cookies.
+
 
     try {
       // Try several common endpoints for fetching the current user profile.
       // Some backends expose `auth/me`, others `user/profile/` or `auth/user/`.
-      const candidateEndpoints = ["auth/me", "user/profile/", "auth/user/"];
+      const candidateEndpoints = ["user/profile/"];
 
       let response = null;
       for (const ep of candidateEndpoints) {
         try {
-          response = await axios.get(getApiUrl(ep));
+          response = await api.get(ep);
           // stop at first successful response
           if (response && response.status >= 200 && response.status < 300)
             break;
@@ -107,14 +110,28 @@ export const useAuthStore = defineStore("auth", () => {
     }
   };
 
+  const initAuth = async () => {
+    if (isInitialized.value) return;
+    refreshAuth(); // <--- Sync headers from localStorage to axios/api instances
+    try {
+      await fetchUser();
+    } catch (e) {
+      console.warn("initAuth: fetchUser failed", e);
+    } finally {
+      isInitialized.value = true;
+    }
+  };
+
   return {
     token,
     user,
     isAuthenticated,
+    isInitialized,
     username,
     setToken,
     clearAuth,
     refreshAuth,
-    fetchUser, // <-- IMPORTANT: Return the new action
+    fetchUser,
+    initAuth,
   };
 });

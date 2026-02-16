@@ -38,14 +38,7 @@
                 class="product-image"
               />
               <div class="sale-badge" v-if="product.is_on_sale">
-                <span v-if="product.sale_badge_image">
-                  <img
-                    :src="product.sale_badge_image"
-                    :alt="t('product.sale_badge_alt')"
-                    class="sale-image"
-                  />
-                </span>
-                <span v-else>{{ t('product.flash_sale') }}</span>
+                <img :src="activeSaleImg" :alt="t('product.sale_badge_alt')" class="sale-image" />
               </div>
               <div
                 class="favorite-icon"
@@ -168,6 +161,7 @@ import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n"; // <-- NEW IMPORT
 
 const { t } = useI18n(); // <-- NEW SETUP
+import activeSaleImg from "@/assets/active_sale.png";
 
 const props = defineProps({
   title: {
@@ -345,14 +339,28 @@ const addToCart = async (product) => {
 
 const scrollSlider = (direction) => {
   if (!slider.value) return;
-  const cardWidth = slider.value.querySelector(".product-card").offsetWidth;
-  const gap = 24;
-  const itemsPerView = 4;
-  const scrollAmount = (cardWidth + gap) * itemsPerView;
-  if (direction === "left") {
-    slider.value.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+  
+  const isMobile = window.innerWidth <= 640;
+  
+  if (isMobile) {
+    const scrollAmount = slider.value.clientWidth;
+    if (direction === "left") {
+      slider.value.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+    } else {
+      slider.value.scrollBy({ left: scrollAmount, behavior: "smooth" });
+    }
   } else {
-    slider.value.scrollBy({ left: scrollAmount, behavior: "smooth" });
+    // Desktop logic
+    const cardWidth = slider.value.querySelector(".product-card")?.offsetWidth || 280;
+    const gap = 24; // 1.5rem
+    const itemsPerView = 4;
+    const scrollAmount = (cardWidth + gap) * itemsPerView;
+    
+    if (direction === "left") {
+      slider.value.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+    } else {
+      slider.value.scrollBy({ left: scrollAmount, behavior: "smooth" });
+    }
   }
 };
 </script>
@@ -439,10 +447,19 @@ const scrollSlider = (direction) => {
   text-decoration: none;
   color: inherit;
   display: block;
-  flex: 1;
-  min-width: 250px;
-  max-width: 350px;
+  flex: 0 0 auto; /* Changed from flex: 1 to ensure width is respected */
+  width: 280px; /* Fixed width for desktop/tablet */
   scroll-snap-align: start;
+}
+
+@media (max-width: 640px) {
+  .product-card-link {
+    width: calc(100% - 24px); /* Show 1 item minus gap (gap is 1.5rem = 24px) */
+    margin-right: 0; /* Align with scroll snap */
+  }
+}
+.product-card-link {
+  min-height: 410px;
 }
 
 .product-card {
@@ -474,11 +491,8 @@ const scrollSlider = (direction) => {
 .sale-badge {
   position: absolute;
   top: 0px;
-  left: 1px;
-  color: white;
-  font-size: 3rem;
-  font-weight: bold;
-  border-radius: 10px;
+  left: 0px;
+  z-index: 5;
 }
 
 .sale-image {

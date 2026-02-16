@@ -192,7 +192,7 @@ watch(locale, async () => {
 }
 
 .category-item {
-  flex: 0 0 calc(20% - 16px);
+  flex: 0 0 120px; /* Fixed width for uniformity */
   scroll-snap-align: start;
   text-align: center;
 }
@@ -208,6 +208,7 @@ watch(locale, async () => {
   text-decoration: none;
   color: #555;
   transition: transform 0.2s ease;
+  width: 100%;
 }
 
 .category-link:hover {
@@ -215,22 +216,38 @@ watch(locale, async () => {
 }
 
 .category-image {
-  width: 100%;
-  height: auto;
-  aspect-ratio: 1 / 1;
-  object-fit: contain;
+  width: 100px; /* Fixed size */
+  height: 100px; /* Fixed size */
+  object-fit: cover; /* Ensure image covers the area without distortion */
   border-radius: 50%;
-  border: 3px solid #f0f0f0; /* Added a subtle border for visual separation */
+  border: 3px solid #f0f0f0; 
   padding: 5px;
+  background-color: white; /* Ensure transparent images look good */
 }
 
 .category-name {
   margin-top: 10px;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 500;
   color: #000000;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .category-item {
+     flex: 0 0 90px;
+  }
+  
+  .category-image {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .category-name {
+    font-size: 0.9rem;
+  }
 }
 </style>

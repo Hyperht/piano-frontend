@@ -191,69 +191,18 @@ const login = async () => {
   }
 };
 
-// New social login function to work with allauth
-// New social login function to work with allauth
+// New social login function - uses full-page redirect instead of popup
 const socialLogin = (provider) => {
-  console.log(`[SocialLogin] Starting login for ${provider}`);
+  console.log(`[SocialLogin] Starting ${provider} login with full-page redirect`);
   
-  // Use relative path to leverage the Vite proxy (defined in vite.config.js)
+  // Use the Vite proxy to redirect to the backend OAuth URL
+  // The backend will handle the OAuth flow and redirect back to /auth/callback
   const authUrl = `/accounts/${provider}/login/`;
-  console.log(`[SocialLogin] Opening popup: ${authUrl}`);
   
-  const authWindow = window.open(authUrl, "_blank", "width=500,height=600");
-
-  // Check if the pop-up window is closed
-  const checkWindowClosed = setInterval(async () => {
-    if (authWindow.closed) {
-      clearInterval(checkWindowClosed);
-      console.log("[SocialLogin] Popup closed. Attempting session exchange...");
-      
-      try {
-        // Exchange the session cookie (set by the popup login) for a JWT token.
-        console.log("[SocialLogin] Calling /api/auth/session-token/");
-        const res = await axios.get("/api/auth/session-token/", {
-            withCredentials: true
-        });
-        
-        console.log("[SocialLogin] Response received:", res.status, res.data);
-
-        if (res.data && res.data.access) {
-           console.log("[SocialLogin] Token found! Logging in...");
-           // Save tokens
-           localStorage.setItem("access_token", res.data.access);
-           localStorage.setItem("refresh_token", res.data.refresh);
-           
-           const returnedUser = res.data.user || { email: "Social User", name: "" };
-
-           // Update store
-           authStore.setToken(res.data.access, returnedUser);
-           
-           // Fetch full user profile if needed
-           if (!res.data.user) {
-              console.log("[SocialLogin] Fetching full user profile...");
-              authStore.fetchUser().catch(e => console.error("[SocialLogin] Fetch user failed", e));
-           }
-           
-           // Redirect to home
-           console.log("[SocialLogin] Redirecting to home...");
-           router.push("/");
-        }
-      } catch (err) {
-        console.error("[SocialLogin] Exchange failed object:", err);
-        console.error("[SocialLogin] Document Cookies (visible):", document.cookie);
-        
-        if (err.response) {
-            console.error("[SocialLogin] Server Error Status:", err.response.status);
-            console.error("[SocialLogin] Server Error Data:", err.response.data);
-            console.error("[SocialLogin] Server Response Headers:", err.response.headers);
-        } else if (err.request) {
-            console.error("[SocialLogin] No response received from server. Network or CORS issue?", err.request);
-        } else {
-            console.error("[SocialLogin] Request setup error:", err.message);
-        }
-      }
-    }
-  }, 500);
+  console.log(`[SocialLogin] Redirecting to: ${authUrl}`);
+  
+  // Full-page redirect - much better UX than popup
+  window.location.href = authUrl;
 };
 </script>
 

@@ -1,37 +1,46 @@
 <template>
   <div class="promo-banner">
-    <img :src="backgroundOverlayImage" alt="Background overlay" class="background-overlay" />
+    <img :src="bgImage" alt="Background overlay" class="background-overlay" />
 
-    <img :src="artworkLeft" alt="Left artwork" class="artwork-left" />
-    <img :src="artworkRight" alt="Right artwork" class="artwork-right" />
+    <div class="content-container">
+      <div class="left-section">
+        <img :src="leftImage" alt="Flash Sale" class="artwork-left" />
+      </div>
 
-    <div class="timer-container">
-      <div class="timer-item">
-        <span class="timer-value">{{ days }}</span>
-        <span class="timer-label">{{ $t('promo.days') }}</span>
+      <div class="center-section">
+        <div class="timer-container">
+          <div class="timer-item">
+            <span class="timer-value">{{ days }}</span>
+            <span class="timer-label">{{ $t('promo.days') }}</span>
+          </div>
+          <div class="timer-separator">:</div>
+          <div class="timer-item">
+            <span class="timer-value">{{ hours }}</span>
+            <span class="timer-label">{{ $t('promo.hours') }}</span>
+          </div>
+          <div class="timer-separator">:</div>
+          <div class="timer-item">
+            <span class="timer-value">{{ minutes }}</span>
+            <span class="timer-label">{{ $t('promo.minutes') }}</span>
+          </div>
+          <div class="timer-separator">:</div>
+          <div class="timer-item">
+            <span class="timer-value">{{ seconds }}</span>
+            <span class="timer-label">{{ $t('promo.seconds') }}</span>
+          </div>
+        </div>
       </div>
-      <div class="timer-separator">:</div>
-      <div class="timer-item">
-        <span class="timer-value">{{ hours }}</span>
-        <span class="timer-label">{{ $t('promo.hours') }}</span>
-      </div>
-      <div class="timer-separator">:</div>
-      <div class="timer-item">
-        <span class="timer-value">{{ minutes }}</span>
-        <span class="timer-label">{{ $t('promo.minutes') }}</span>
-      </div>
-      <div class="timer-separator">:</div>
-      <div class="timer-item">
-        <span class="timer-value">{{ seconds }}</span>
-        <span class="timer-label">{{ $t('promo.seconds') }}</span>
+
+      <div class="right-section">
+        <img :src="rightImage" alt="Up to 70% off" class="artwork-right" />
+        <router-link :to="saleLinkTarget" class="view-all-link">
+          {{ $t("general.view_all") }}
+        </router-link>
       </div>
     </div>
-
-    <router-link :to="saleLinkTarget" class="view-all-link">
-      {{ $t("general.view_all") }}
-    </router-link>
   </div>
 </template>
+
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router'; 
@@ -45,10 +54,10 @@ import artworkRight from '../assets/Group 5.png';
 
 const router = useRouter(); 
 
-// 💡 EDITED: Define the target link for sale products using the specific query parameter
+// Define the target link for sale products using the specific query parameter
 const saleLinkTarget = { 
-  name: 'Search', // Assuming your product list/search route is named 'Search'
-  query: { is_on_sale: 'true' } // Use the specific query for sale products
+  name: 'Search', 
+  query: { is_on_sale: 'true' } 
 };
 
 // Timer logic
@@ -83,14 +92,36 @@ const startCountdown = (targetDateString) => {
   }, 1000);
 };
 
-// New function to fetch the promo date from the backend
+// Reactive refs for images
+const bgImage = ref(backgroundOverlayImage);
+const leftImage = ref(artworkLeft);
+const rightImage = ref(artworkRight);
+
+// Function to fetch the promo date from the backend
 const fetchPromo = async () => {
     try {
-      const response = await axios.get(getApiUrl('promo-banner/'));
-      const targetDate = response.data.end_date;
-      startCountdown(targetDate);
+        const response = await axios.get(getApiUrl('dashboard/promo-banners/active/'));
+        const data = response.data;
+        
+        if (data && data.end_date) {
+            startCountdown(data.end_date);
+            
+            // Update images if available
+            if (data.background_image) bgImage.value = data.background_image;
+            if (data.left_image) leftImage.value = data.left_image;
+            if (data.right_image) rightImage.value = data.right_image;
+        } else {
+             // Fallback to default/hardcoded if no active banner
+             const now = new Date();
+             const durationInMs = (1 * 24 * 60 * 60 * 1000) + (19 * 60 * 60 * 1000);
+             startCountdown(new Date(now.getTime() + durationInMs));
+        }
     } catch (error) {
-      console.error("Error fetching promo banner data:", error);
+        console.error("Error fetching promo banner data:", error);
+         // Fallback
+         const now = new Date();
+         const durationInMs = (1 * 24 * 60 * 60 * 1000) + (19 * 60 * 60 * 1000);
+         startCountdown(new Date(now.getTime() + durationInMs));
     }
 };
 
@@ -99,21 +130,26 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  clearInterval(countdownInterval);
+  if (countdownInterval) clearInterval(countdownInterval);
 });
 </script>
+
 <style scoped>
 .promo-banner {
-  max-width: 99%;
-  margin: 2rem auto;
+  width: 100%;
+  max-width: 100%;
+  margin: 1.5rem auto;
   position: relative;
-  height: 250px;
   border-radius: 12px;
   overflow: hidden;
-  background-color: orange;
+  background-color: #FFA500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 250px;
 }
 
-/* New background overlay image style */
+/* Background overlay image style */
 .background-overlay {
   position: absolute;
   top: 0;
@@ -122,39 +158,61 @@ onUnmounted(() => {
   height: 100%;
   object-fit: cover;
   z-index: 1; 
+  pointer-events: none;
 }
 
-.artwork-left,
-.artwork-right {
-  position: absolute;
-  width: 200px;
-  height: auto;
+.content-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  position: relative;
   z-index: 2;
-  top: 50%;
-  transform: translateY(-50%);
+  padding: 1rem 3%; /* Default padding */
+}
+
+.left-section, .right-section, .center-section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.center-section {
+  flex: 2; /* Give timer more space */
+  justify-content: center;
+}
+
+.left-section {
+  justify-content: flex-start;
+}
+
+.right-section {
+  justify-content: flex-end;
+  /* position: relative; removed to allow natural flow */
+  flex-direction: column; /* Stack image and link */
+  align-items: flex-end;
+  gap: 10px;
 }
 
 .artwork-left {
-  left: 50px;
+  width: 100%;
+  max-width: 250px;
+  height: auto;
+  object-fit: contain;
 }
 
 .artwork-right {
-  right: 150px;
+  width: 100%;
+  max-width: 250px;
+  height: auto;
+  object-fit: contain;
 }
 
 .timer-container {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 3;
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  
-  backdrop-filter: blur(5px);
-  padding: 1rem 2rem;
-  border-radius: 10px;
   color: #fff;
   text-align: center;
 }
@@ -168,34 +226,110 @@ onUnmounted(() => {
   font-size: 2.5rem;
   font-weight: bold;
   line-height: 1;
+  margin-top: -15px;
 }
 
 .timer-value {
-  font-size: 2.5rem;
+  font-size: 3rem;
   font-weight: bold;
 }
 
 .timer-label {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   text-transform: uppercase;
-  margin-top: -5px;
+  margin-top: 0px;
+  opacity: 0.9;
 }
 
 .view-all-link {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  z-index: 3;
   color: #fff;
-  
-  padding: 10px 20px;
-  border-radius: 6px;
+  font-size: 1rem;
   text-decoration: none;
   font-weight: bold;
-  transition: background-color 0.2s ease;
+  transition: opacity 0.2s ease;
+  white-space: nowrap;
 }
 
 .view-all-link:hover {
-  background-color: rgb(184, 121, 5);
+  text-decoration: underline;
+}
+
+/* RESPONSIVE BREAKPOINTS */
+
+/* Tablet (< 992px) */
+@media (max-width: 992px) {
+  .timer-value {
+    font-size: 2.5rem;
+  }
+  .timer-separator {
+    font-size: 2rem;
+  }
+  .artwork-left, .artwork-right {
+    max-width: 180px;
+  }
+  .timer-container {
+    gap: 1rem;
+  }
+}
+
+/* Mobile (< 768px) */
+@media (max-width: 768px) {
+  .promo-banner {
+    padding: 1.5rem 0;
+    height: auto;
+    min-height: auto;
+  }
+
+  .content-container {
+    flex-direction: column;
+    padding: 1rem;
+    gap: 2rem;
+    align-items: center;
+  }
+
+  .left-section, .right-section, .center-section {
+    width: 100%;
+    justify-content: center;
+    flex: unset; /* Remove flex weights */
+  }
+
+  .right-section {
+    align-items: center;
+  }
+
+  /* Order adjustment: Image -> Timer -> Discount */
+  .left-section { order: 1; }
+  .center-section { order: 2; margin-top: -10px; margin-bottom: -10px; }
+  .right-section { order: 3; }
+
+  .artwork-left {
+    max-width: 200px;
+  }
+  .artwork-right {
+    max-width: 200px;
+  }
+  
+  .timer-value {
+    font-size: 2rem;
+  }
+  .timer-separator {
+    font-size: 1.8rem;
+  }
+}
+
+/* Small Mobile (< 480px) */
+@media (max-width: 480px) {
+  .timer-value {
+    font-size: 1.8rem;
+  }
+  .timer-separator {
+    font-size: 1.5rem;
+  }
+  .timer-container {
+    gap: 0.5rem;
+  }
+  .artwork-left, .artwork-right {
+    max-width: 160px;
+  }
 }
 </style>

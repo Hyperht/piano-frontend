@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+import { useAuthStore } from "@/stores/auth";
 import Home from "../components/Home.vue";
 import LoginPage from "../components/LoginPage.vue";
 import SignUpPage from "../components/SignUp.vue";
@@ -19,6 +20,7 @@ import paymentPage from "../components/paymentPage.vue";
 import Orders from "../components/Orders.vue";
 import AddressesPage from "../components/AddressesPage.vue";
 import AddressShow from "../components/addresshow.vue";
+import AuthCallback from "../components/AuthCallback.vue";
 
 const routes = [
   {
@@ -45,6 +47,11 @@ const routes = [
     path: "/Signup",
     name: "SignUp",
     component: SignUpPage,
+  },
+  {
+    path: "/auth/callback",
+    name: "AuthCallback",
+    component: AuthCallback,
   },
   {
     path: "/cart",
@@ -141,10 +148,16 @@ const router = createRouter({
 });
 
 // Authentication guard - redirect unauthenticated users to login
-router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem("access_token");
+// Authentication guard - redirect unauthenticated users to login
+router.beforeEach(async (to, from, next) => {
+  const authStore = useAuthStore();
 
-  if (to.meta.requiresAuth && !token) {
+  // Optionally wait for initialization if not yet done (though main.js handles this for initial load)
+  if (!authStore.isInitialized) {
+    await authStore.initAuth();
+  }
+
+  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     // Redirect to login with the intended destination
     next({ name: "Login", query: { redirect: to.fullPath } });
   } else {
@@ -152,4 +165,15 @@ router.beforeEach((to, from, next) => {
   }
 });
 
+// ==============================================
+// ADMIN PANEL INTEGRATION - Safe Route Extension
+// ==============================================
+// Import admin routes module
+import { adminRoutes } from '../modules/admin/router/admin.routes.js';
+
+// Safely add admin routes without modifying existing routes
+router.addRoute(adminRoutes);
+// ==============================================
+
 export default router;
+

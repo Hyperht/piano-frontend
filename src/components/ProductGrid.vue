@@ -24,14 +24,7 @@
             />
 
             <div class="sale-badge" v-if="product.is_on_sale">
-              <span v-if="product.sale_badge_image">
-                <img
-                  :src="product.sale_badge_image"
-                  alt="Sale"
-                  class="sale-image"
-                />
-              </span>
-              <span v-else>{{ $t("product.sale") }}</span>
+              <img :src="activeSaleImg" alt="Sale" class="sale-image" />
             </div>
             <div class="favorite-icon" @click.stop.prevent="toggleFavorite(product)">
               <svg
@@ -136,6 +129,7 @@ import { useToast } from "vue-toastification";
 import { useCartStore } from "@/stores/Cart";
 import { useAuthStore } from "@/stores/auth";
 import { getApiUrl } from "@/config/api";
+import activeSaleImg from "@/assets/active_sale.png";
 
 // Localization helper: display localized fields when backend provides per-locale objects or name_en/name_ar fields
 const { locale } = useI18n();
@@ -429,26 +423,15 @@ const addToCart = async (product) => {
 /* ⭐ UPDATED SALE BADGE CSS START ⭐ */
 .sale-badge {
   position: absolute;
-  top: 10px; /* Adjusted position */
-  left: 10px; /* Adjusted position */
+  top: 0px;
+  left: 0px;
   z-index: 5;
 }
 
 /* Style for the Sale image inside the badge */
 .sale-image {
-  width: 70px;
+  width: 70px; /* Adjust size as needed, maybe slightly larger for a corner ribbon */
   height: auto;
-}
-
-/* Style for the text fallback (when no sale_badge_image is provided) */
-.sale-badge {
-  position: absolute;
-  top: 0px;
-  left: 1px;
-  color: white;
-  font-size: 3rem;
-  font-weight: bold;
-  border-radius: 10px;
 }
 /* ⭐ UPDATED SALE BADGE CSS END ⭐ */
 

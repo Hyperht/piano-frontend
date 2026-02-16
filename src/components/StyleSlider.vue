@@ -61,14 +61,26 @@ const fetchStyles = async () => {
 const scrollSlider = (direction) => {
   if (!slider.value) return;
 
-  const cardWidth = 300; 
-  const gap = 24; // This must match the gap in your CSS (1.5rem = 24px)
-  const scrollAmount = cardWidth + gap;
-  
-  if (direction === 'left') {
-    slider.value.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+  const isMobile = window.innerWidth <= 640;
+
+  if (isMobile) {
+    const scrollAmount = slider.value.clientWidth;
+    if (direction === 'left') {
+      slider.value.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+    } else {
+      slider.value.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
   } else {
-    slider.value.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    // Desktop logic
+    const cardWidth = 300; 
+    const gap = 24; // This must match the gap in your CSS (1.5rem = 24px)
+    const scrollAmount = cardWidth + gap;
+    
+    if (direction === 'left') {
+      slider.value.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+    } else {
+      slider.value.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
   }
 };
 
@@ -115,6 +127,7 @@ h2 {
   scrollbar-width: none;
   -ms-overflow-style: none;
   scroll-behavior: smooth;
+  scroll-snap-type: x mandatory; /* Added for snap behavior */
 }
 
 .styles-slider::-webkit-scrollbar {
@@ -130,6 +143,14 @@ h2 {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease;
   cursor: pointer;
+  scroll-snap-align: start; /* Added for snap behavior */
+}
+
+@media (max-width: 640px) {
+  .style-card {
+    width: calc(100% - 24px); /* Show 1 item minus gap */
+    margin-right: 0;
+  }
 }
 
 .style-card:hover {

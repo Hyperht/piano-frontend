@@ -1,10 +1,45 @@
 import { createApp, watch } from "vue";
 import { createPinia } from "pinia";
+import { useAuthStore } from "@/stores/auth";
 import App from "./App.vue";
 import router from "./router";
 import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
 import "./assets/main.css";
+import "./assets/responsive.css";
+import axios from "axios";
+import { API_CONFIG } from "@/config/api";
+import VueApexCharts from "vue3-apexcharts"
+
+// Set global axios defaults for legacy components
+axios.defaults.withCredentials = true;
+
+// Helper to get cookie value
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
+// Global CSRF Interceptor
+axios.interceptors.request.use(config => {
+  if (['post', 'put', 'patch', 'delete'].includes(config.method.toLowerCase())) {
+    const csrftoken = getCookie('csrftoken');
+    if (csrftoken) {
+      config.headers['X-CSRFToken'] = csrftoken;
+    }
+  }
+  return config;
+});
 
 import i18n from "./i18n";
 
@@ -12,7 +47,17 @@ const app = createApp(App);
 const pinia = createPinia();
 
 app.use(pinia);
+app.use(VueApexCharts);
+
+// ==============================================
+// ADMIN PANEL - Vuetify Integration
+// ==============================================
+import vuetify from './modules/admin/plugins/vuetify';
+app.use(vuetify);
+// ==============================================
+
 app.use(router);
+
 
 // --- Debugging: Router navigation hooks to capture problematic navigations ---
 router.beforeEach((to, from, next) => {
@@ -109,4 +154,7 @@ window.addEventListener("unhandledrejection", (ev) => {
 window.addEventListener("error", (ev) => {
   console.error("[WINDOW ERROR]", ev.error || ev.message, ev);
 });
-app.mount("#app");
+const authStore = useAuthStore();
+authStore.initAuth().then(() => {
+  app.mount("#app");
+});

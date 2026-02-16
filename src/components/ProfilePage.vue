@@ -127,7 +127,7 @@
 import { ref, onMounted } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
-import axios from "axios";
+import api from "@/config/api";
 import { getApiUrl } from "@/config/api";
 import { useAuthStore } from "@/stores/auth";
 import { useToast } from "vue-toastification";
@@ -150,36 +150,18 @@ const error = ref(null);
  * Fetches the user's current profile information from the backend.
  */
 const fetchProfile = async () => {
-  // 🌟 IMPROVEMENT: Resolve the actual token value from the Pinia store
-  // The store may expose a ref or a plain string depending on context,
-  // so normalize to the raw token string before using it.
-  const rawToken = authStore.token;
-  const token =
-    rawToken && rawToken.value !== undefined ? rawToken.value : rawToken;
-
-  if (!token) {
-    // If no token exists, but we are on the profile page, force logout/redirect.
-    if (authStore.isAuthenticated) {
-      if (typeof authStore.clearAuth === "function") {
-        authStore.clearAuth();
-      } else if (typeof authStore.logout === "function") {
-        authStore.logout();
-      }
-      toast.error(t("profile.auth_required"));
-    }
-    router.push("/login");
-    return;
+  if (!authStore.isAuthenticated) {
+     // If store says not authenticated, redirect
+     router.push("/login");
+     return;
   }
 
   loading.value = true;
   error.value = null;
 
   try {
-    const response = await axios.get(getApiUrl("user/profile/"), {
-      headers: {
-        Authorization: `Bearer ${token}`, // Use the resolved token string
-      },
-    });
+    // Use configured API instance which handles base URL and cookies/headers
+    const response = await api.get("user/profile/");
 
     const data = response.data;
 
@@ -203,10 +185,18 @@ const fetchProfile = async () => {
 /**
  * Logs out the user and redirects to the home page or login page.
  */
-const logoutUser = () => {
-  authStore.logout();
-  router.push("/");
-  toast.info(t("profile.logged_out"));
+const logoutUser = async () => {
+  try {
+    // Call backend logout to invalidate session
+    await api.post("/auth/logout/");
+  } catch (err) {
+    console.warn("Backend logout failed:", err);
+    // Continue with client-side logout anyway
+  } finally {
+    authStore.logout();
+    router.push("/");
+    toast.info(t("profile.logged_out"));
+  }
 };
 
 // Fetch data when the component is mounted
@@ -221,129 +211,199 @@ onMounted(() => {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background-color: var(--bg-color);
 }
 
 .main-content-container {
   flex-grow: 1;
-  max-width: 1200px;
-  margin: 2rem auto;
-  padding: 0 2rem;
+  max-width: var(--container-width);
+  margin: var(--spacing-lg) auto;
+  padding: 0 var(--spacing-sm);
   width: 100%;
 }
 
 .page-layout {
   display: flex;
-  gap: 3rem;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  min-height: 500px; /* Ensure content is visible */
+  gap: var(--spacing-lg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  min-height: 500px;
+  background-color: var(--bg-card);
+  overflow: hidden; /* Contains rounded corners */
 }
 
 /* Sidebar Navigation */
 .sidebar-nav {
   width: 280px;
-  background-color: #f7f7f7;
-  border-right: 1px solid #e0e0e0;
-  padding: 1.5rem 0;
-  border-top-left-radius: 8px;
-  border-bottom-left-radius: 8px;
+  background-color: var(--bg-card);
+  border-right: 1px solid var(--border-color);
+  padding: var(--spacing-md) 0;
+  flex-shrink: 0;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  padding: 1rem 2rem;
-  font-size: 1rem;
+  padding: 1rem var(--spacing-md);
+  font-size: var(--font-size-base);
   font-weight: 500;
-  color: #333;
+  color: var(--text-color);
   cursor: pointer;
-  transition: background-color 0.2s;
-  text-decoration: none; /* For router-link */
+  transition: background-color 0.2s, color 0.2s;
+  text-decoration: none;
+  border-left: 5px solid transparent;
 }
 
 .nav-item svg {
-  margin-right: 0.75rem;
-  color: #666;
+  margin-right: var(--spacing-xs);
+  color: var(--text-light);
   width: 20px;
   height: 20px;
+  transition: color 0.2s;
 }
 
 .nav-item:hover {
-  background-color: #eeeeee;
+  background-color: var(--bg-color);
 }
 
 .nav-item.active {
-  color: #008080; /* The teal color from the image */
-  background-color: #e0f2f2; /* Light teal background */
-  border-left: 5px solid #008080;
-  margin-left: -5px; /* Adjust for border */
+  color: var(--primary-color);
+  background-color: var(--primary-light);
+  border-left-color: var(--primary-color);
 }
 
 .nav-item.active svg {
-  color: #008080;
+  color: var(--primary-color);
 }
 
 /* Profile Content */
 .profile-content {
   flex-grow: 1;
-  padding: 2.5rem;
+  padding: var(--spacing-lg);
 }
 
 .content-header {
-  font-size: 1.8rem;
+  font-size: var(--font-size-2xl);
   font-weight: 700;
-  color: #333;
-  margin-bottom: 2rem;
+  color: var(--text-color);
+  margin-bottom: var(--spacing-lg);
 }
 
 .profile-details-container {
-  max-width: 500px;
+  max-width: 600px;
 }
 
 .form-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--spacing-md);
 }
 
 .form-group label {
   display: block;
-  font-size: 0.9rem;
+  font-size: var(--font-size-sm);
   font-weight: 600;
-  color: #555;
-  margin-bottom: 0.5rem;
+  color: var(--text-light);
+  margin-bottom: var(--spacing-xs);
 }
 
 .form-group input {
   width: 100%;
   padding: 0.75rem 1rem;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   box-sizing: border-box;
   transition: border-color 0.2s;
+  color: var(--text-color);
+  background-color: var(--bg-card);
 }
 
 .form-group input:focus {
-  border-color: #008080;
+  border-color: var(--primary-color);
   outline: none;
 }
 
-/* Added back .readonly-input to style non-editable fields */
 .readonly-input {
-  background-color: #f0f0f0;
-  cursor: default; /* Use default cursor to show it's not interactive */
-  color: #555;
+  background-color: var(--bg-color) !important;
+  cursor: default;
+  color: var(--text-light) !important;
 }
-
-/* Removed styles related to update-btn and submission messages */
 
 /* Loading and Error States */
 .loading-state,
 .error-state {
-  padding: 2rem 0;
+  padding: var(--spacing-lg) 0;
   text-align: center;
-  font-size: 1.2rem;
-  color: #888;
+  font-size: var(--font-size-lg);
+  color: var(--text-light);
 }
 
-/* Submission Message styles removed */
+.error-state {
+  color: var(--error);
+}
+
+/* Responsive Breakpoints */
+
+/* XXL */
+@media (min-width: 1400px) {
+  .main-content-container {
+    max-width: 1400px;
+  }
+}
+
+/* MD to LG (Tablet Landscape) */
+@media (max-width: 992px) {
+  .sidebar-nav {
+    width: 240px;
+  }
+}
+
+/* SM to MD (Tablet Portrait / Large Phone) */
+@media (max-width: 768px) {
+  .page-layout {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .sidebar-nav {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    overflow-x: auto;
+    padding: 0;
+  }
+
+  .nav-item {
+    padding: var(--spacing-sm);
+    flex-shrink: 0;
+    border-left: none;
+    border-bottom: 3px solid transparent;
+    margin-left: 0;
+  }
+  
+  .nav-item.active {
+    border-left: none;
+    border-bottom-color: var(--primary-color);
+  }
+
+  .profile-content {
+    padding: var(--spacing-md);
+  }
+}
+
+/* XS (Phone) */
+@media (max-width: 576px) {
+  .main-content-container {
+    margin: var(--spacing-sm) auto;
+    padding: 0 var(--spacing-xs);
+  }
+  
+  .content-header {
+    font-size: var(--font-size-xl);
+  }
+  
+  .sidebar-nav {
+    /* Keep horizontal scroll for menu on small screens */
+  }
+}
 </style>

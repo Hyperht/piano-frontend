@@ -224,7 +224,7 @@ onMounted(() => {
 
 @media (max-width: 768px) {
   .grid-container {
-    flex-direction: column;
+    flex-direction: row;
     height: auto;
     aspect-ratio: unset;
     overflow-x: visible;
