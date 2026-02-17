@@ -31,22 +31,23 @@
     </div>
   </div>
 </template>
+
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router'; 
-import { useI18n } from 'vue-i18n'; // Added i18n
+import { useI18n } from 'vue-i18n';
 import axios from 'axios';
 import { getApiUrl } from '@/config/api';
 
 const router = useRouter(); 
-const { t } = useI18n(); // Added i18n
+const { t } = useI18n();
 
 const rooms = ref([]);
 const slider = ref(null);
 
 const fetchRooms = async () => {
   try {
-  const response = await axios.get(getApiUrl('rooms/'));
+    const response = await axios.get(getApiUrl('rooms/'));
     rooms.value = response.data;
   } catch (error) {
     console.error('Failed to fetch rooms:', error);
@@ -56,35 +57,24 @@ const fetchRooms = async () => {
 const scrollSlider = (direction) => {
   if (!slider.value) return;
 
-  const isMobile = window.innerWidth <= 640;
+  const firstCard = slider.value.querySelector('.room-card');
+  if (!firstCard) return;
 
-  if (isMobile) {
-    const scrollAmount = slider.value.clientWidth;
-    if (direction === 'left') {
-      slider.value.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-    } else {
-      slider.value.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-    }
-  } else {
-    // Desktop Logic
-    const cardWidth = 300; 
-    const gap = 24; // Matches 1.5rem in CSS
-    const scrollAmount = cardWidth + gap;
-    
-    if (direction === 'left') {
-      slider.value.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-    } else {
-      slider.value.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-    }
-  }
+  // Dynamically calculate the width of one card + the gap
+  const cardWidth = firstCard.offsetWidth;
+  const gap = parseInt(window.getComputedStyle(slider.value).gap) || 0;
+  const scrollAmount = cardWidth + gap;
+  
+  slider.value.scrollBy({ 
+    left: direction === 'left' ? -scrollAmount : scrollAmount, 
+    behavior: 'smooth' 
+  });
 };
 
-// FIX: Change navigation to route to the general 'Search' page 
-// using the room name as a query parameter (q) to filter products tagged with that room.
 const goToCategory = (roomName) => {
     router.push({ 
-      name: 'Search', // Assuming your search results page route name is 'Search'
-      query: { q: roomName.trim() } // Use the room name to filter products
+      name: 'Search', 
+      query: { q: roomName.trim() } 
     });
 };
 
@@ -92,15 +82,15 @@ onMounted(() => {
   fetchRooms();
 });
 </script>
+
 <style scoped>
 .room-slider-container {
   padding: 2rem 1rem;
-  
   position: relative;
 }
 
 h2 {
-  text-align: top left;
+  text-align: left;
   margin-bottom: 2rem;
   font-family: 'Playfair Display', serif;
 }
@@ -109,20 +99,17 @@ h2 {
   display: flex;
   align-items: center;
   position: relative;
-  /* Keep overflow-x: hidden here for the wrapper */
-  overflow-x: hidden; 
 }
 
 .rooms-slider {
   display: flex;
-  gap: 1.5rem; /* 1.5rem = 24px */
-  padding: 0 1rem;
-  /* The actual scrolling happens here */
-  overflow-x: auto; 
+  gap: 1.5rem;
+  overflow-x: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
   scroll-behavior: smooth;
-  scroll-snap-type: x mandatory; /* Added for snap behavior */
+  scroll-snap-type: x mandatory;
+  padding: 10px 0; /* Ensures box-shadow isn't cut off */
 }
 
 .rooms-slider::-webkit-scrollbar {
@@ -131,20 +118,31 @@ h2 {
 
 .room-card {
   flex-shrink: 0;
-  /* FIX: Use a fixed width instead of a percentage calculation */
-  width: 300px; 
+  width: 300px; /* PC Width */
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease;
-  cursor: pointer; /* Already set, but important for user experience */
-  scroll-snap-align: start; /* Added for snap behavior */
+  cursor: pointer;
+  scroll-snap-align: start;
 }
 
+/* MOBILE FIX: Exactly one card */
 @media (max-width: 640px) {
+  .rooms-slider {
+    gap: 0; /* Remove gap so the next card is perfectly hidden */
+    padding: 10px 0;
+  }
+
   .room-card {
-    width: calc(100% - 24px); /* Show 1 item minus gap */
-    margin-right: 0;
+    width: 100%; /* Take up full slider width */
+    scroll-snap-align: center;
+    border-radius: 0; /* Optional: cleaner edge-to-edge look on mobile */
+  }
+
+  .nav-button {
+    width: 32px;
+    height: 32px;
   }
 }
 
@@ -165,12 +163,12 @@ h2 {
 }
 
 .nav-button {
-  background-color: #fff;
+  background-color: rgba(255, 255, 255, 0.9);
   border: none;
   border-radius: 50%;
   width: 40px;
   height: 40px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   cursor: pointer;
   z-index: 10;
   display: flex;
@@ -182,10 +180,10 @@ h2 {
 }
 
 .prev-button {
-  left: 10px;
+  left: 0;
 }
 
 .next-button {
-  right: 10px;
+  right: 0;
 }
 </style>
