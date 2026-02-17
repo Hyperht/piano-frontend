@@ -189,7 +189,7 @@
   },
   "header": {
     "logo_alt": "Piano Home Furniture Logo",
-    "search_placeholder": "Search products...",
+    "search_placeholder": "Search ...",
     "search": "Search",
     "login": "Log In",
     "favorites": "Favorites (Wishlist)",
@@ -521,4 +521,5 @@
 }
 
 }
+
 }
