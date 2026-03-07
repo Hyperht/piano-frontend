@@ -9,7 +9,7 @@
             <div style="display: flex; align-items: center; justify-content: space-between;">
               <div>
                 <p class="name">{{ addr.first_name }} {{ addr.last_name }}</p>
-                <p class="phone">{{ addr.phone_number }}</p>
+                <p class="phone">{{ addr.phone_number_1 }} <span v-if="addr.phone_number_2">| {{ addr.phone_number_2 }}</span></p>
                 <p class="street">{{ addr.street_address }}</p>
                 <p class="area">{{ addr.area?.name || addr.area }}</p>
               </div>
@@ -81,7 +81,7 @@ const fetchAddresses = async () => {
   loading.value = true;
   try {
     const resp = await api.get("/user/addresses/");
-    addresses.value = resp.data || [];
+    addresses.value = resp.data.results || [];
   } catch (err) {
     console.error("Failed to fetch addresses:", err);
     toast.error(t("addresses.fetch_error"));

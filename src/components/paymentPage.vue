@@ -55,13 +55,35 @@
             <div class="coupon-input">
               <input
                 type="text"
+                v-model="couponCode"
                 :placeholder="$t('payment.placeholder_coupon')"
-                disabled
+                :disabled="cartStore.appliedCoupon"
               />
-              <button class="apply-btn" disabled>
+              <button 
+                v-if="!cartStore.appliedCoupon"
+                @click="handleApplyCoupon" 
+                class="apply-btn" 
+                :disabled="!couponCode"
+                style="opacity: 1; cursor: pointer;"
+              >
                 {{ $t("payment.apply") }}
               </button>
+              <button 
+                v-else
+                @click="cartStore.removeCoupon" 
+                class="remove-coupon-btn"
+              >
+                {{ $t("payment.remove") || 'Remove' }}
+              </button>
             </div>
+            <p v-if="cartStore.appliedCoupon" class="coupon-success">
+              {{ $t("payment.coupon_applied") || 'Coupon applied' }}: {{ cartStore.appliedCoupon.code }}
+            </p>
+          </div>
+
+          <div v-if="cartStore.discountAmount > 0" class="summary-item discount">
+            <span>{{ $t("payment.discount") || 'Discount' }}</span>
+            <span class="price">-{{ cartStore.discountAmount.toFixed(2) }} EGP</span>
           </div>
 
           <div class="summary-item total-price">
@@ -103,12 +125,17 @@ const selectedPaymentMethod = ref("COD");
 // State for shipping cost (should be passed/stored from the previous step)
 const shippingCost = ref(0.0);
 
+// Coupon state
+const couponCode = ref("");
+
 // --- COMPUTED PROPERTIES ---
 const calculatedTotal = computed(() => {
   // Assuming cartStore.cartTotal is numeric (or can be parsed)
   const subtotal = parseFloat(cartStore.cartTotal) || 0;
   const cost = parseFloat(shippingCost.value) || 0;
-  return (subtotal + cost).toFixed(2);
+  const discount = parseFloat(cartStore.discountAmount) || 0;
+  const total = subtotal + cost - discount;
+  return (total > 0 ? total : 0).toFixed(2);
 });
 
 // --- LIFECYCLE: Load real data ---
@@ -122,8 +149,7 @@ onMounted(async () => {
   await cartStore.fetchCart();
 
   // 3. Set Shipping Cost
-  // *** IMPORTANT: You must get the REAL shipping cost from a checkout/address store
-  shippingCost.value = 100.0; // Replace with actual logic
+  shippingCost.value = 0.0;
 
   // Try to fetch the selected address from the query parameter
   try {
@@ -132,7 +158,7 @@ onMounted(async () => {
         router.currentRoute.value.query.addressId ||
         router.currentRoute.value.query.address
     );
-    if (addressId) {
+    if (addressId && !isNaN(addressId)) {
       const resp = await api.get(`user/addresses/${addressId}/`);
       selectedAddress.value = resp.data;
       shippingCost.value = parseFloat(resp.data.area?.shipping_cost || 0);
@@ -145,6 +171,16 @@ onMounted(async () => {
 // --- HANDLERS ---
 const selectPaymentMethod = (method) => {
   selectedPaymentMethod.value = method;
+};
+
+const handleApplyCoupon = async () => {
+  if (!couponCode.value) return;
+  const result = await cartStore.applyCoupon(couponCode.value);
+  if (result.success) {
+    toast.success(result.message);
+  } else {
+    toast.error(result.message);
+  }
 };
 
 const placeOrder = () => {
@@ -176,15 +212,17 @@ const placeOrder = () => {
           shipping_address: {
             first_name: address.first_name,
             last_name: address.last_name,
-            phone_number: address.phone_number,
+            phone_number_1: address.phone_number_1,
+            phone_number_2: address.phone_number_2 || "",
             street_address: address.street_address,
             apartment_details: address.apartment_details || "",
             area_id: Number(address.area && (address.area.id || address.area)),
           },
           payment_method:
             selectedPaymentMethod.value === "COD"
-              ? "Cash on Delivery"
-              : selectedPaymentMethod.value,
+               ? "Cash on Delivery"
+               : selectedPaymentMethod.value,
+          coupon_code: cartStore.appliedCoupon ? cartStore.appliedCoupon.code : "",
         };
 
         const checkoutResp = await api.post("checkout/", payload);
@@ -386,8 +424,38 @@ h3 {
   color: white;
   border: none;
   border-radius: 8px;
-  cursor: not-allowed; /* Disabled in payment for simplicity */
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.apply-btn:hover {
+  background-color: #d67a0f;
+}
+
+.apply-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
   opacity: 0.6;
+}
+
+.remove-coupon-btn {
+  padding: 0.5rem 1rem;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.coupon-success {
+  color: #20b486;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.summary-item.discount {
+  color: #e74c3c;
+  font-weight: 500;
 }
 
 /* Updated final button style/label */

@@ -78,16 +78,16 @@ const fetchOrders = async () => {
   loading.value = true;
   error.value = null;
   try {
-    const resp = await api.get("user/orders/");
-    // API likely returns a list
+    const resp = await api.get("history/");
+    // API returns a list or paginated object
     orders.value = Array.isArray(resp.data)
       ? resp.data
-      : resp.data.results || [];
+      : (resp.data.results || []);
 
-    // For each order, fetch detailed order (to get items with product image/id)
+    // For each order, fetch detailed order
     const detailPromises = orders.value.map((o) =>
       api
-        .get(`user/orders/${o.id}/`)
+        .get(`history/${o.id}/`)
         .then((r) => ({ id: o.id, data: r.data }))
         .catch((e) => ({ id: o.id, error: e }))
     );

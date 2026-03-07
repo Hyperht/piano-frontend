@@ -8,9 +8,9 @@
     "scroll_right": "Scroll right",
     "toggle_language": "Switch language"
   },
-    "search": {
-  "results_header": "Results for '{query}'",
-  "no_results": "No products found for your search."
+  "search": {
+    "results_header": "Results for '{query}'",
+    "no_results": "No products found for your search."
   },
   "about_us": {
     "title": "About us",
@@ -154,6 +154,8 @@
   "filter": {
     "title": "Filter",
     "clear_btn": "Clear Filters",
+    "show_filters": "Show Filters",
+    "hide_filters": "Hide Filters",
     "loading": "Loading filter options...",
     "sort_title": "Sort by",
     "sort_default": "Most relevant",
@@ -193,7 +195,8 @@
     "search": "Search",
     "login": "Log In",
     "favorites": "Favorites (Wishlist)",
-    "cart": "Shopping Cart"
+    "cart": "Shopping Cart",
+    "menu": "Menu"
   },
   "hero_slides": {
     "button_text_shop_now": "Shop Now"
@@ -230,7 +233,6 @@
       "network": "A network error occurred. Please check your connection."
     }
   },
-
   "signup": {
     "title": "Create Your Account",
     "subtitle": "Sign up to start your journey with us.",
@@ -362,14 +364,14 @@
     "no_products_in_category": "No products found in this category.",
     "sale": "Sale",
     "toasts": {
-        "must_login_favorites": "Please log in to manage favorites.",
-        "fav_added": "Product added to favorites!",
-        "fav_removed": "Product removed from favorites.",
-        "auth_failed": "Authentication failed. Please log in again.",
-        "fav_update_failed": "Failed to update favorites.",
-        "must_login_add_to_cart": "Please log in to add items to your cart.",
-        "added_to_cart": "Added {name} to cart!",
-        "add_failed": "Failed to add product to cart."
+      "must_login_favorites": "Please log in to manage favorites.",
+      "fav_added": "Product added to favorites!",
+      "fav_removed": "Product removed from favorites.",
+      "auth_failed": "Authentication failed. Please log in again.",
+      "fav_update_failed": "Failed to update favorites.",
+      "must_login_add_to_cart": "Please log in to add items to your cart.",
+      "added_to_cart": "Added {name} to cart!",
+      "add_failed": "Failed to add product to cart."
     },
     "view_all": "View All",
     "flash_sale": "Flash Sale",
@@ -378,148 +380,145 @@
     "removed_from_favorites": "Product removed from favorites.",
     "failed_to_update_favorites": "Failed to update favorites (Check API Configuration)."
   },
-"profile": {
-  "title": "My Account",
-  "close_sidebar": "Close profile menu",
-  "logging_out": "Logging out...",
-  "menu": {
-    "details": "Profile Details",
-    "orders": "My Orders",
-    "addresses": "My Addresses"
+  "profile": {
+    "title": "My Account",
+    "close_sidebar": "Close profile menu",
+    "logging_out": "Logging out...",
+    "menu": {
+      "details": "Profile Details",
+      "orders": "My Orders",
+      "addresses": "My Addresses"
+    },
+    "logout": "Log out",
+    "details_header": "Account Details",
+    "loading": "Loading profile information...",
+    "loading_error": "Failed to load profile. Please try again.",
+    "field": {
+      "name": "Full Name",
+      "email": "Email Address"
+    },
+    "auth_required": "Authentication required. Please log in.",
+    "session_expired": "Your session has expired. Please log in again.",
+    "logged_out": "You have been logged out successfully."
   },
-  "logout": "Log out",
-  "details_header": "Account Details",
-  "loading": "Loading profile information...",
-  "loading_error": "Failed to load profile. Please try again.",
-  "field": {
-    "name": "Full Name",
-    "email": "Email Address"
-  },
-  "auth_required": "Authentication required. Please log in.",
-  "session_expired": "Your session has expired. Please log in again.",
-  "logged_out": "You have been logged out successfully."
-},
   "promo": {
-  "days": "Days",
-  "hours": "Hours",
-  "minutes": "Minutes",
-  "seconds": "Seconds"
-},
-"policy": {
-  "return": {
-    "header": "Return Policy",
-    "intro": "At Piano Home Furniture, we prioritize customer satisfaction and want you to be completely happy with your purchase. If for any reason you’re not satisfied with your furniture, we’re here to help.",
-    "eligibility": {
-      "title": "Eligibility for Returns",
-      "point_1": "Items must be returned within 30 days of receiving your order.",
-      "point_2": "The furniture must be in its original condition, unused, and with all original packaging and tags.",
-      "point_3": "Custom or personalized items are non-refundable unless they arrive damaged or defective."
-    },
-    "initiation": {
-      "title": "How to Initiate a Return",
-      "step_1_strong": "Contact Us:",
-      "step_1_text": "Reach out to our customer service team at [email/phone number] to start the return process. Please provide your order number, item details, and the reason for the return.",
-      "step_2_strong": "Prepare the Item:",
-      "step_2_text": "Safely repack the furniture in its original packaging. Ensure all parts, instructions, and accessories are included.",
-      "step_3_strong": "Return Shipping:",
-      "step_3_text": "We will provide you with a return shipping label, or you can choose your own shipping method. Return shipping costs are the responsibility of the customer, unless the item is defective or damaged upon arrival."
-    },
-    "refunds": {
-      "title": "Refunds",
-      "text": "Once we receive your returned item and inspect it, we will process your refund. Refunds will be issued to your original payment method within 7-10 business days. Shipping fees are non-refundable unless the return is due to a defect or error on our part."
-    },
-    "damaged": {
-      "title": "Damaged or Defective Items",
-      "text": "If your furniture arrives damaged or defective, please notify us within 48 hours of delivery. We will arrange for a replacement, repair, or full refund at no additional cost."
-    },
-    "exchanges": {
-      "title": "Exchanges",
-      "text": "We do not offer direct exchanges. If you wish to exchange an item, please return the original item and place a new order."
-    },
-    "illustration_alt": "Return Policy Illustration Placeholder"
+    "days": "Days",
+    "hours": "Hours",
+    "minutes": "Minutes",
+    "seconds": "Seconds"
   },
-"address": {
-  "card": {
-    "deliver_to": "Deliver to {governorate}",
-    "default_governorate": "Egypt",
-    "edit_address": "Edit this address",
-    "add_new_button": "Add new address",
-    "separator": "/"
-  },
-  "form": {
-    "title": "Shipping Address",
-    "shipping_cost_label": "Shipping: {cost} {currency}",
-    "default_checkbox": "Set as default shipping address",
-    "save_button": "Save Address & Confirm Location",
-    "select": {
-      "governorate": "Select Governorate",
-      "area": "Select Area"
+  "policy": {
+    "return": {
+      "header": "Return Policy",
+      "intro": "At Piano Home Furniture, we prioritize customer satisfaction and want you to be completely happy with your purchase. If for any reason you’re not satisfied with your furniture, we’re here to help.",
+      "eligibility": {
+        "title": "Eligibility for Returns",
+        "point_1": "Items must be returned within 30 days of receiving your order.",
+        "point_2": "The furniture must be in its original condition, unused, and with all original packaging and tags.",
+        "point_3": "Custom or personalized items are non-refundable unless they arrive damaged or defective."
+      },
+      "initiation": {
+        "title": "How to Initiate a Return",
+        "step_1_strong": "Contact Us:",
+        "step_1_text": "Reach out to our customer service team at [email/phone number] to start the return process. Please provide your order number, item details, and the reason for the return.",
+        "step_2_strong": "Prepare the Item:",
+        "step_2_text": "Safely repack the furniture in its original packaging. Ensure all parts, instructions, and accessories are included.",
+        "step_3_strong": "Return Shipping:",
+        "step_3_text": "We will provide you with a return shipping label, or you can choose your own shipping method. Return shipping costs are the responsibility of the customer, unless the item is defective or damaged upon arrival."
+      },
+      "refunds": {
+        "title": "Refunds",
+        "text": "Once we receive your returned item and inspect it, we will process your refund. Refunds will be issued to your original payment method within 7-10 business days. Shipping fees are non-refundable unless the return is due to a defect or error on our part."
+      },
+      "damaged": {
+        "title": "Damaged or Defective Items",
+        "text": "If your furniture arrives damaged or defective, please notify us within 48 hours of delivery. We will arrange for a replacement, repair, or full refund at no additional cost."
+      },
+      "exchanges": {
+        "title": "Exchanges",
+        "text": "We do not offer direct exchanges. If you wish to exchange an item, please return the original item and place a new order."
+      },
+      "illustration_alt": "Return Policy Illustration Placeholder"
     },
-    "placeholder": {
-      "first_name": "First name",
-      "last_name": "Last name",
-      "phone": "Phone",
-      "street": "Street Address (e.g., Building No, Street Name)",
-      "apartment": "Apartment/Floor/Details (Optional)"
+    "address": {
+      "card": {
+        "deliver_to": "Deliver to {governorate}",
+        "default_governorate": "Egypt",
+        "edit_address": "Edit this address",
+        "add_new_button": "Add new address",
+        "separator": "/"
+      },
+      "form": {
+        "title": "Shipping Address",
+        "shipping_cost_label": "Shipping: {cost} {currency}",
+        "default_checkbox": "Set as default shipping address",
+        "save_button": "Save Address & Confirm Location",
+        "select": {
+          "governorate": "Select Governorate",
+          "area": "Select Area"
+        },
+        "placeholder": {
+          "first_name": "First name",
+          "last_name": "Last name",
+          "phone": "Phone",
+          "street": "Street Address (e.g., Building No, Street Name)",
+          "apartment": "Apartment/Floor/Details (Optional)"
+        },
+        "validation": {
+          "area_required": "Please select both a Governorate and an Area."
+        },
+        "success_toast": "Address saved! Shipping cost: {cost} {currency}."
+      }
     },
-    "validation": {
-      "area_required": "Please select both a Governorate and an Area."
-    },
-    "success_toast": "Address saved! Shipping cost: {cost} {currency}."
-  }
-},
-"legal": {
-  "terms": {
-    "title": "Terms & Condition",
-    "intro": "Welcome to Piano Home Furniture. By accessing or using our website, you agree to comply with and be bound by the following Terms of Use. Please read them carefully. If you do not agree to these terms, you should not use our website.",
-    "section_1": {
-      "header": "1. Acceptance of Terms",
-      "body": "By using the Piano Home Furniture website, you agree to these Terms of Use, as well as our Privacy Policy and any other guidelines or rules that may be posted on the website. We reserve the right to modify or revise these terms at any time, and your continued use of the site constitutes acceptance of any changes."
-    },
-    "section_2": {
-      "header": "2. Use of Website",
-      "body": "You agree to use the website only for lawful purposes and in a way that does not infringe the rights of, restrict, or inhibit anyone else’s use and enjoyment of the website. Prohibited behavior includes harassing or causing distress to any other person, transmitting obscene or offensive content, or disrupting the normal flow of dialogue within the website."
-    },
-    "section_3": {
-      "header": "3. Account and Security",
-      "body": "When you create an account on our website, you agree to provide accurate, current, and complete information. You are responsible for maintaining the confidentiality of your account password and for all activities that occur under your account. If you suspect unauthorized use of your account, please contact us immediately."
-    },
-    "section_4": {
-      "header": "4. Intellectual Property",
-      "body": "All content on the Piano Home Furniture website, including text, graphics, logos, images, and software, is the property of Piano Home Furniture or its content suppliers and is protected by intellectual property laws. You may not reproduce, distribute, or exploit any content for commercial purposes without our written consent."
-    },
-    "section_5": {
-      "header": "5. Product Descriptions",
-      "body": "We strive to ensure that the product descriptions on our website are accurate and up-to-date. However, we do not guarantee that the descriptions, images, or other content are error-free, complete, or current. If a product offered by Piano Home Furniture is not as described, your sole remedy is to return it in unused condition."
-    },
-    "section_6": {
-      "header": "6. Pricing and Payment",
-      "body": "All prices and payment methods are subject to change without notice. We reserve the right to modify prices, discontinue products, or update product information at any time. Payment for products must be made through our secure payment system at the time of purchase."
-    },
-    "section_7": {
-      "header": "7. Limitation of Liability",
-      "body": "Piano Home Furniture will not be liable for any direct, indirect, incidental, or consequential damages arising out of your use of the website or inability to access the website. We do not guarantee that the website will be uninterrupted or error-free, and we are not responsible for any technical issues beyond our control."
-    },
-    "section_8": {
-      "header": "8. Links to Third-Party Websites",
-      "body": "The website may contain links to third-party websites for your convenience. These links do not imply endorsement or affiliation with those sites. We are not responsible for the content, privacy practices, or terms of use of third-party websites."
-    },
-    "section_9": {
-      "header": "9. Termination of Use",
-      "body": "We reserve the right to terminate your access to the website, without notice, if you violate any of these Terms of Use or engage in any illegal activity."
-    },
-    "section_10": {
-      "header": "10. Governing Law",
-      "body": "These Terms of Use are governed by and construed in accordance with the laws of [Country/Region], without regard to its conflict of law principles. You agree that any legal action or proceeding arising out of or related to these terms shall be brought exclusively in the courts located in [City, Country/Region]."
-    },
-    "section_11": {
-      "header": "11. Contact Information",
-      "body": "If you have any questions about these Terms of Use, please contact us at [email/phone number]."
+    "legal": {
+      "terms": {
+        "title": "Terms & Condition",
+        "intro": "Welcome to Piano Home Furniture. By accessing or using our website, you agree to comply with and be bound by the following Terms of Use. Please read them carefully. If you do not agree to these terms, you should not use our website.",
+        "section_1": {
+          "header": "1. Acceptance of Terms",
+          "body": "By using the Piano Home Furniture website, you agree to these Terms of Use, as well as our Privacy Policy and any other guidelines or rules that may be posted on the website. We reserve the right to modify or revise these terms at any time, and your continued use of the site constitutes acceptance of any changes."
+        },
+        "section_2": {
+          "header": "2. Use of Website",
+          "body": "You agree to use the website only for lawful purposes and in a way that does not infringe the rights of, restrict, or inhibit anyone else’s use and enjoyment of the website. Prohibited behavior includes harassing or causing distress to any other person, transmitting obscene or offensive content, or disrupting the normal flow of dialogue within the website."
+        },
+        "section_3": {
+          "header": "3. Account and Security",
+          "body": "When you create an account on our website, you agree to provide accurate, current, and complete information. You are responsible for maintaining the confidentiality of your account password and for all activities that occur under your account. If you suspect unauthorized use of your account, please contact us immediately."
+        },
+        "section_4": {
+          "header": "4. Intellectual Property",
+          "body": "All content on the Piano Home Furniture website, including text, graphics, logos, images, and software, is the property of Piano Home Furniture or its content suppliers and is protected by intellectual property laws. You may not reproduce, distribute, or exploit any content for commercial purposes without our written consent."
+        },
+        "section_5": {
+          "header": "5. Product Descriptions",
+          "body": "We strive to ensure that the product descriptions on our website are accurate and up-to-date. However, we do not guarantee that the descriptions, images, or other content are error-free, complete, or current. If a product offered by Piano Home Furniture is not as described, your sole remedy is to return it in unused condition."
+        },
+        "section_6": {
+          "header": "6. Pricing and Payment",
+          "body": "All prices and payment methods are subject to change without notice. We reserve the right to modify prices, discontinue products, or update product information at any time. Payment for products must be made through our secure payment system at the time of purchase."
+        },
+        "section_7": {
+          "header": "7. Limitation of Liability",
+          "body": "Piano Home Furniture will not be liable for any direct, indirect, incidental, or consequential damages arising out of your use of the website or inability to access the website. We do not guarantee that the website will be uninterrupted or error-free, and we are not responsible for any technical issues beyond our control."
+        },
+        "section_8": {
+          "header": "8. Links to Third-Party Websites",
+          "body": "The website may contain links to third-party websites for your convenience. These links do not imply endorsement or affiliation with those sites. We are not responsible for the content, privacy practices, or terms of use of third-party websites."
+        },
+        "section_9": {
+          "header": "9. Termination of Use",
+          "body": "We reserve the right to terminate your access to the website, without notice, if you violate any of these Terms of Use or engage in any illegal activity."
+        },
+        "section_10": {
+          "header": "10. Governing Law",
+          "body": "These Terms of Use are governed by and construed in accordance with the laws of [Country/Region], without regard to its conflict of law principles. You agree that any legal action or proceeding arising out of or related to these terms shall be brought exclusively in the courts located in [City, Country/Region]."
+        },
+        "section_11": {
+          "header": "11. Contact Information",
+          "body": "If you have any questions about these Terms of Use, please contact us at [email/phone number]."
+        }
+      }
     }
-    
   }
-}
-
-}
-
 }

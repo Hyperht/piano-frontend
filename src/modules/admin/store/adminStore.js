@@ -63,6 +63,13 @@ export const useAdminStore = defineStore('adminCustomizer', () => {
             ]
         },
         {
+            name: 'Vendors',
+            icon: 'mdiStore',
+            model: 'Vendor',
+            endpoint: '/dashboard/vendors/',
+            fields: ['name', 'commission_rate', { name: 'is_active', type: 'boolean' }]
+        },
+        {
             name: 'Products',
             icon: 'mdiPackageVariantClosed',
             model: 'Product',
@@ -71,15 +78,43 @@ export const useAdminStore = defineStore('adminCustomizer', () => {
                 'name',
                 { name: 'description', type: 'textarea' },
                 'original_price', 'sale_price',
-                { name: 'is_on_sale', type: 'boolean' }, 'rating',
+                { name: 'is_on_sale', type: 'boolean' },
+                { name: 'rating', placeholder: '0.0 – 5.0' },
+                { name: 'quantity', type: 'number', placeholder: 'Stock count' },
                 { name: 'image', type: 'image' },
                 { name: 'is_active', type: 'boolean' },
+                { name: 'vendor', type: 'select', endpoint: '/dashboard/vendors/' },
                 { name: 'category', type: 'select', endpoint: '/dashboard/categories/' },
                 { name: 'subcategory', type: 'select', endpoint: '/dashboard/subcategories/' },
                 'dimensions',
                 { name: 'colors', type: 'select', endpoint: '/dashboard/colors/', multiple: true },
                 { name: 'rooms', type: 'select', endpoint: '/dashboard/rooms/', multiple: true },
-                { name: 'styles', type: 'select', endpoint: '/dashboard/styles/', multiple: true }
+                { name: 'styles', type: 'select', endpoint: '/dashboard/styles/', multiple: true },
+            ],
+            // Columns shown in the data table (separate from edit form fields)
+            tableColumns: ['name', 'vendor_name', 'category_name', 'original_price', 'is_active']
+        },
+        {
+            name: 'Inventory',
+            icon: 'mdiWarehouse',
+            model: 'StockMovement',
+            endpoint: '/dashboard/inventory/',
+            fields: [
+                { name: 'product', type: 'select', endpoint: '/dashboard/products/' },
+                'change_amount',
+                {
+                    name: 'reason',
+                    type: 'select',
+                    options: [
+                        { id: 'ORDER', name: 'Order' },
+                        { id: 'RETURN', name: 'Return' },
+                        { id: 'DAMAGE', name: 'Damage' },
+                        { id: 'THEFT', name: 'Theft' },
+                        { id: 'MANUAL', name: 'Manual Adjustment' },
+                        { id: 'OTHER', name: 'Other' }
+                    ]
+                },
+                { name: 'created_at', type: 'datetime' }
             ]
         },
         {
@@ -97,8 +132,10 @@ export const useAdminStore = defineStore('adminCustomizer', () => {
             fields: [
                 'name',
                 { name: 'parent_category', type: 'select', endpoint: '/dashboard/categories/' },
-                { name: 'image', type: 'image' }
-            ]
+                { name: 'image', type: 'image' },
+                { name: 'slug', type: 'text' }
+            ],
+            tableColumns: ['name', 'category_name', 'slug']
         },
         {
             name: 'Colors',
@@ -132,6 +169,7 @@ export const useAdminStore = defineStore('adminCustomizer', () => {
                     name: 'status',
                     type: 'select',
                     options: [
+                        { id: 'NEW', name: 'New' },
                         { id: 'PENDING', name: 'Pending' },
                         { id: 'PROCESSING', name: 'Processing' },
                         { id: 'SHIPPED', name: 'Shipped' },
@@ -139,44 +177,22 @@ export const useAdminStore = defineStore('adminCustomizer', () => {
                         { id: 'CANCELLED', name: 'Cancelled' }
                     ]
                 },
-                'final_total',
-                'created_at'
+                'total_amount',
+                'cart_subtotal',
+                { name: 'created_at', type: 'datetime' }
             ]
-        },
-        {
-            name: 'Order Items',
-            icon: 'mdiViewList',
-            model: 'OrderItem',
-            endpoint: '/dashboard/orders/items/', // Note: OrderItems currently nested or separate? Let's check logic. Actually wait.
-            // If we look at urls.py, OrderViewSet is at /dashboard/orders/. 
-            // The previous code had /api/orders/items/. 
-            // For now, let's stick to the convention we just built. 
-            // We didn't explicitly create OrderItemViewSet in dashboard. 
-            // But we can add it if needed. 
-            // Wait, OrderItem is usually best managed VIA Orders.
-            // But for consistency let's leave this one carefully or point to sales.py generic if implemented.
-            // Actually, we didn't implement OrderItemViewSet in sales.py. We implemented CartItemViewSet.
-            // Let's remove OrderItem generic table if it's not crucial, or map it later.
-            // User's code had /api/orders/items/.
-            // Let's keep it consistent: '/dashboard/order-items/' if we add it, or map to existing.
-            // Correction: I did NOT add OrderItemViewSet to sales.py.
-            // I added CartItemViewSet.
-            // Let's assume Order Items are managed inside Orders for now.
-            fields: ['order', 'product_name', 'quantity', 'price_at_purchase']
-        },
-        {
-            name: 'Reviews',
-            icon: 'mdiStar',
-            model: 'Review',
-            endpoint: '/dashboard/reviews/',
-            fields: ['user', 'product', 'rating', 'comment']
         },
         {
             name: 'Coupons',
             icon: 'mdiTicketPercent',
             model: 'Coupon',
             endpoint: '/dashboard/coupons/',
-            fields: ['code', 'discount_percent', 'valid_from', 'valid_to', 'is_active']
+            fields: [
+                'code', 'discount_value',
+                { name: 'valid_from', type: 'datetime' },
+                { name: 'expires_at', type: 'datetime' },
+                { name: 'is_active', type: 'boolean' }
+            ]
         },
         {
             name: 'Hero Slides',
@@ -195,7 +211,7 @@ export const useAdminStore = defineStore('adminCustomizer', () => {
                 { name: 'background_image', type: 'image' },
                 { name: 'left_image', type: 'image' },
                 { name: 'right_image', type: 'image' },
-                { name: 'end_date', placeholder: 'YYYY-MM-DD HH:MM:SS' },
+                { name: 'end_date', type: 'datetime' },
                 { name: 'is_active', type: 'boolean' }
             ]
         },
@@ -218,51 +234,48 @@ export const useAdminStore = defineStore('adminCustomizer', () => {
             icon: 'mdiMapMarkerRadius',
             model: 'Area',
             endpoint: '/dashboard/areas/',
-            fields: ['name', 'governorate', 'shipping_cost']
+            fields: [
+                'name',
+                { name: 'governorate', type: 'select', endpoint: '/dashboard/governorates/' },
+                'shipping_cost'
+            ],
+            tableColumns: ['name', 'governorate_name', 'shipping_cost']
         },
         {
             name: 'Addresses',
             icon: 'mdiHomeCity',
             model: 'Address',
             endpoint: '/dashboard/addresses/',
-            fields: ['user', 'first_name', 'last_name', 'phone_number', 'street_address', 'area']
-        },
-        {
-            name: 'Favorites',
-            icon: 'mdiHeart',
-            model: 'Favorite',
-            endpoint: '/dashboard/favorites/',
-            fields: ['user', 'product', 'created_at']
+            fields: [
+                { name: 'user', type: 'select', endpoint: '/dashboard/users/' },
+                'first_name', 'last_name', 'phone_number', 'street_address', 'apartment_details',
+                { name: 'area', type: 'select', endpoint: '/dashboard/areas/' }
+            ],
+            tableColumns: ['user_email', 'first_name', 'last_name', 'area_name', 'governorate_name']
         },
         {
             name: 'Carts',
             icon: 'mdiCart',
             model: 'Cart',
             endpoint: '/dashboard/cart/',
-            fields: ['user', 'coupon', 'is_active']
-        },
-        {
-            name: 'Cart Items',
-            icon: 'mdiCartPlus',
-            model: 'CartItem',
-            endpoint: '/dashboard/cart-items/',
-            fields: ['cart', 'product', 'quantity']
+            fields: ['user', 'is_active', 'updated_at']
         },
         {
             name: 'Contact Messages',
             icon: 'mdiEmailOutline',
             model: 'ContactMessage',
             endpoint: '/dashboard/contact/',
-            fields: ['name', 'email', 'subject', 'message', 'created_at']
+            fields: ['name', 'email', 'subject', 'message', { name: 'created_at', type: 'datetime' }]
         },
         {
             name: 'Product Images',
             icon: 'mdiImage',
             model: 'ProductImage',
-            endpoint: '/dashboard/products/images/', // This one might need a specific viewset
-            fields: ['product', 'image', 'alt_text', 'color']
+            endpoint: '/dashboard/products/images/',
+            fields: ['product', 'image', 'is_primary']
         }
     ]);
+
 
 
 
@@ -350,3 +363,4 @@ export const useAdminStore = defineStore('adminCustomizer', () => {
         fetchOrdersChart
     };
 });
+

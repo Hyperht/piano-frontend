@@ -21,6 +21,7 @@ import Orders from "../components/Orders.vue";
 import AddressesPage from "../components/AddressesPage.vue";
 import AddressShow from "../components/addresshow.vue";
 import AuthCallback from "../components/AuthCallback.vue";
+import NotAuthorized from "../components/NotAuthorized.vue";
 
 const routes = [
   {
@@ -139,6 +140,11 @@ const routes = [
     component: AddressShow,
     meta: { requiresAuth: true },
   },
+  {
+    path: "/401",
+    name: "NotAuthorized",
+    component: NotAuthorized,
+  },
   // 4. New route for Payment Page
 ];
 
@@ -148,7 +154,6 @@ const router = createRouter({
 });
 
 // Authentication guard - redirect unauthenticated users to login
-// Authentication guard - redirect unauthenticated users to login
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
 
@@ -157,9 +162,15 @@ router.beforeEach(async (to, from, next) => {
     await authStore.initAuth();
   }
 
-  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+  const requiresAdmin = to.matched.some(record => record.meta.requiresAdmin);
+
+  if (requiresAuth && !authStore.isAuthenticated) {
     // Redirect to login with the intended destination
     next({ name: "Login", query: { redirect: to.fullPath } });
+  } else if (requiresAdmin && (!authStore.user || !authStore.user.is_staff)) {
+    // Redirect to 401 Not Authorized if the user is not staff
+    next({ name: "NotAuthorized" });
   } else {
     next();
   }

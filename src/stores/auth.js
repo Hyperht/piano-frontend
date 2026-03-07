@@ -56,6 +56,7 @@ export const useAuthStore = defineStore("auth", () => {
   const fetchUser = async () => {
     // We try to fetch user even if no token is present in state,
     // because we might rely on HttpOnly cookies.
+    if (!token.value) return;
 
 
     try {

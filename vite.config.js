@@ -10,29 +10,30 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
+      vue: "vue/dist/vue.esm-bundler.js",
     },
   },
   server: {
     port: 3001,
     proxy: {
       "/api": {
-        target: "beanomart.com",
+        target: "http://localhost:8000",
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, "/api"),
       },
       "/accounts": {
-        target: "beanomart.com",
+        target: "http://localhost:8000",
         changeOrigin: true,
         secure: false,
       },
       "/media": {
-        target: "beanomart.com",
+        target: "http://localhost:8000",
         changeOrigin: true,
         secure: false,
       },
       "/static": {
-        target: "beanomart.com",
+        target: "http://localhost:8000",
         changeOrigin: true,
         secure: false,
       },

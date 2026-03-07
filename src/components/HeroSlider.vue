@@ -58,7 +58,7 @@ let intervalId = null;
 const fetchSlides = async () => {
   try {
     const response = await axios.get(getApiUrl('hero-slides/'));
-    slides.value = response.data;
+    slides.value = Array.isArray(response.data) ? response.data : (response.data.results || []);
     if (slides.value.length > 1) startAutoSlide();
   } catch (error) {
     console.error('Error:', error);

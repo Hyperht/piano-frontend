@@ -154,6 +154,8 @@
   "filter": {
     "title": "تصفية",
     "clear_btn": "مسح التصفية",
+    "show_filters": "عرض الفلاتر",
+    "hide_filters": "إخفاء الفلاتر",
     "loading": "جاري تحميل خيارات التصفية...",
     "sort_title": "ترتيب حسب",
     "sort_default": "الأكثر صلة",
@@ -193,7 +195,8 @@
     "search": "بحث",
     "login": "تسجيل الدخول",
     "favorites": "المفضلة",
-    "cart": "عربة التسوق"
+    "cart": "عربة التسوق",
+    "menu": "القائمة"
   },
   "hero_slides": {
     "button_text_shop_now": "تسوق الآن"
@@ -375,7 +378,12 @@
     "sale_badge_alt": "شارة التخفيض",
     "added_to_favorites": "تم إضافة المنتج إلى المفضلة!",
     "removed_from_favorites": "تم إزالة المنتج من المفضلة.",
-    "failed_to_update_favorites": "فشل تحديث المفضلة (تحقق من إعدادات واجهة البرمجيات)."
+    "failed_to_update_favorites": "فشل تحديث المفضلة (تحقق من إعدادات واجهة البرمجيات).",
+    "testing_product": {
+      "name": "منتج تجريبي",
+      "short_description": "عنصر نائب للمنتجات التي تخضع لاختبارات المزامنة.",
+      "description": "هذا سجل منتج وهمي يستخدم للتحقق من النظام."
+    }
   },
   "profile": {
     "title": "حسابي",

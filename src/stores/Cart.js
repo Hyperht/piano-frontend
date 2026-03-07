@@ -11,6 +11,8 @@ const API_URL = API_CONFIG.BASE_URL + '/';
 export const useCartStore = defineStore('cart', () => {
   const items = ref([]);
   const isLoading = ref(false);
+  const appliedCoupon = ref(null);
+  const discountAmount = ref(0.00);
 
   const authStore = useAuthStore();
 
@@ -27,7 +29,14 @@ export const useCartStore = defineStore('cart', () => {
     }, 0);
     return total.toFixed(2);
   });
-  
+
+  const discountedTotal = computed(() => {
+    const subtotal = parseFloat(cartTotal.value) || 0;
+    const discount = parseFloat(discountAmount.value) || 0;
+    const total = subtotal - discount;
+    return (total > 0 ? total : 0).toFixed(2);
+  });
+
   const cartItemCount = computed(() => {
     if (!items.value || items.value.length === 0) {
       return 0;
@@ -43,7 +52,7 @@ export const useCartStore = defineStore('cart', () => {
         items.value = [];
         return;
       }
-      
+
       const response = await axios.get(`${API_URL}cart/`, {
         headers: {
           Authorization: `Bearer ${authStore.token}`
@@ -92,7 +101,7 @@ export const useCartStore = defineStore('cart', () => {
         throw new Error("User not authenticated. Please log in.");
       }
 
-      const url = `${API_URL}cart/items/${itemId}/`;
+      const url = `${API_URL}cart-items/${itemId}/`;
 
       try {
         await axios.delete(url, { headers: { Authorization: `Bearer ${authStore.token}` } });
@@ -162,7 +171,7 @@ export const useCartStore = defineStore('cart', () => {
         throw new Error("User not authenticated. Please log in.");
       }
 
-      const url = `${API_URL}cart/items/${itemId}/`;
+      const url = `${API_URL}cart-items/${itemId}/`;
 
       try {
         await axios.patch(url, { quantity }, { headers: { Authorization: `Bearer ${authStore.token}` } });
@@ -267,14 +276,57 @@ export const useCartStore = defineStore('cart', () => {
     }
   };
 
+  const applyCoupon = async (code) => {
+    try {
+      if (!authStore.isAuthenticated) {
+        throw new Error("User not authenticated.");
+      }
+      const response = await axios.post(
+        `${API_URL}marketing/validate-coupon/`,
+        { code },
+        {
+          headers: {
+            Authorization: `Bearer ${authStore.token}`
+          }
+        }
+      );
+
+      if (response.data.valid) {
+        appliedCoupon.value = {
+          code: response.data.code,
+          discount_type: response.data.discount_type,
+          discount_value: response.data.discount_value
+        };
+        discountAmount.value = parseFloat(response.data.discount_amount);
+        return { success: true, message: "Coupon applied successfully!" };
+      } else {
+        return { success: false, message: response.data.error || "Invalid coupon code." };
+      }
+    } catch (error) {
+      console.error('Error applying coupon:', error);
+      const errorMsg = error.response?.data?.error || "Failed to apply coupon.";
+      return { success: false, message: errorMsg };
+    }
+  };
+
+  const removeCoupon = () => {
+    appliedCoupon.value = null;
+    discountAmount.value = 0.00;
+  };
+
   return {
     items,
     isLoading,
     cartTotal,
+    discountedTotal,
     cartItemCount,
+    appliedCoupon,
+    discountAmount,
     fetchCart,
     addItem,
     removeItem,
     updateItemQuantity,
+    applyCoupon,
+    removeCoupon,
   };
 });

@@ -111,7 +111,8 @@ const localizedSubtitle = (obj) => localizedName(obj, 'subtitle');
 const fetchPromotions = async () => {
   try {
     const response = await axios.get(getApiUrl('promo-grid-categories/'));
-    promotions.value = response.data.sort((a, b) => a.order - b.order);
+    const data = Array.isArray(response.data) ? response.data : (response.data.results || []);
+    promotions.value = data.sort((a, b) => a.order - b.order);
     sortedPromos.value = promotions.value.slice(0, 4);
   } catch (error) {
     console.error('Failed to fetch promo grid categories:', error);

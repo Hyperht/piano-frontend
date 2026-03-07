@@ -148,37 +148,27 @@ const login = async () => {
 
   try {
     const response = await axios.post(getApiUrl("login/"), {
-      // FIX: This sends the email value to the backend under the 'username' field,
-      // which the backend is expecting.
-      username: email.value,
+      email: email.value,
       password: password.value,
     });
 
-    // Persist tokens
     localStorage.setItem("access_token", response.data.access);
     localStorage.setItem("refresh_token", response.data.refresh);
 
-    // Prefer any user object returned directly in the login response.
-    // Common fields are `user`, `user_info`, or `profile` depending on backend.
     const resp = response.data || {};
     const returnedUser = resp.user || resp.user_info || resp.profile || null;
 
     if (returnedUser) {
-      // Store the token and the returned user so UI updates immediately
       authStore.setToken(response.data.access, returnedUser);
     } else {
-      // No user in login response: set token and a lightweight placeholder (email),
-      // then fetch the full profile in background. Do not await to avoid blocking UI.
       authStore.setToken(response.data.access, {
         email: email.value,
         name: "",
       });
       authStore.fetchUser().catch(() => {
-        // swallow fetch errors — we already log them in the store
       });
     }
 
-    // Navigate to home (don't wait for fetchUser)
     router.push("/");
   } catch (err) {
     if (err.response && err.response.data) {
@@ -191,23 +181,18 @@ const login = async () => {
   }
 };
 
-// New social login function - uses full-page redirect instead of popup
 const socialLogin = (provider) => {
   console.log(`[SocialLogin] Starting ${provider} login with full-page redirect`);
   
-  // Use the Vite proxy to redirect to the backend OAuth URL
-  // The backend will handle the OAuth flow and redirect back to /auth/callback
   const authUrl = `/accounts/${provider}/login/`;
   
   console.log(`[SocialLogin] Redirecting to: ${authUrl}`);
   
-  // Full-page redirect - much better UX than popup
   window.location.href = authUrl;
 };
 </script>
 
 <style scoped>
-/* Your existing styles... */
 *,
 *::before,
 *::after {

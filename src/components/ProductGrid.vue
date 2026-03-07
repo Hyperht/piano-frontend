@@ -226,8 +226,9 @@ const fetchFavorites = async () => {
   }
   try {
     const response = await api.get("favorites/");
+    const data = Array.isArray(response.data) ? response.data : (response.data.results || []);
     favoriteProductIds.value = new Set(
-      response.data.map((item) => item.product.id)
+      data.map((item) => item.product.id)
     );
   } catch (error) {
     console.error(
@@ -248,12 +249,12 @@ const fetchProducts = async (endpoint) => {
   const headers = token ? { Authorization: `Bearer ${token}` } : {};
   try {
     const response = await api.get(endpoint);
-    let fetchedProducts = response.data;
+    let fetchedProducts = Array.isArray(response.data) ? response.data : (response.data.results || []);
 
     // Check if we are fetching the favorites list itself
     if (endpoint === "favorites") {
       // Assume API returns [{id: fav_id, product: {...}}, ...]
-      fetchedProducts = response.data.map((item) => ({
+      fetchedProducts = fetchedProducts.map((item) => ({
         ...item.product,
         // Keep the favorite ID for easier removal/toggling
         favorite_item_id: item.id,

@@ -53,7 +53,7 @@ const slider = ref(null);
 const fetchStyles = async () => {
   try {
     const response = await axios.get(getApiUrl('styles/'));
-    styles.value = response.data;
+    styles.value = Array.isArray(response.data) ? response.data : (response.data.results || []);
   } catch (error) {
     console.error('Failed to fetch styles:', error);
   }

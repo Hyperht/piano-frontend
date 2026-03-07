@@ -48,7 +48,7 @@ const slider = ref(null);
 const fetchRooms = async () => {
   try {
     const response = await axios.get(getApiUrl('rooms/'));
-    rooms.value = response.data;
+    rooms.value = Array.isArray(response.data) ? response.data : (response.data.results || []);
   } catch (error) {
     console.error('Failed to fetch rooms:', error);
   }

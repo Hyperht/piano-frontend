@@ -221,7 +221,7 @@ const router = useRouter();
 const authStore = useAuthStore();
 const cartStore = useCartStore();
 const toast = useToast();
-const { t, locale } = useI18n();
+const { t, te, locale } = useI18n();
 
 // Helper to pick a localized field (handles { en: '', ar: '' } shapes or name_en / name_ar)
 // Also looks up `products.{slug}.{field}` in locale files as a frontend override.
@@ -252,8 +252,10 @@ const localizedValue = (obj, field) => {
   if (base) {
     const slug = slugify(base);
     const key = `products.${slug}.${field}`;
-    const translated = t(key);
-    if (translated && translated !== key) return translated;
+    if (te(key)) {
+      const translated = t(key);
+      if (translated && translated !== key) return translated;
+    }
   }
 
   return value || obj[field] || "";

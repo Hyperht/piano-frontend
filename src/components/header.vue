@@ -165,7 +165,7 @@
             <router-link
               :to="{
                 name: 'CategoryPage',
-                params: { categoryName: category.name.toLowerCase() },
+                params: { categoryName: (category.name || '').toLowerCase() },
               }"
             >
               {{ localizedName(category) }}
@@ -184,8 +184,8 @@
                     :to="{
                       name: 'SubCategoryPage',
                       params: {
-                        categoryName: category.name.toLowerCase(),
-                        subCategoryName: subcategory.name.toLowerCase(),
+                        categoryName: (category.name || 'all').toLowerCase(),
+                        subCategoryName: (subcategory.name || 'all').toLowerCase(),
                       },
                     }"
                   >
@@ -220,7 +220,7 @@
                 <router-link
                 :to="{
                     name: 'CategoryPage',
-                    params: { categoryName: category.name.toLowerCase() },
+                    params: { categoryName: (category.name || '').toLowerCase() },
                 }"
                 @click="isMobileMenuOpen = false"
                 >
@@ -234,8 +234,8 @@
                     :to="{
                         name: 'SubCategoryPage',
                         params: {
-                            categoryName: category.name.toLowerCase(),
-                            subCategoryName: sub.name.toLowerCase(),
+                            categoryName: (category.name || 'all').toLowerCase(),
+                            subCategoryName: (sub.name || 'all').toLowerCase(),
                         },
                     }"
                     @click="isMobileMenuOpen = false"
@@ -339,6 +339,8 @@ const localizedName = (obj, field = "name") => {
   if (obj[candidate]) return obj[candidate];
 
   const base = (obj[field] || obj.name || "").toString().trim();
+  if (!base) return obj[field] || obj.name || "";
+  
   const slug = slugify(base);
 
   // Try multiple key variants to handle minor differences/typos from backend
@@ -449,7 +451,7 @@ const logout = () => {
 const fetchCategories = async () => {
   try {
     const response = await axios.get(getApiUrl("categories/"));
-    categories.value = response.data;
+    categories.value = Array.isArray(response.data) ? response.data : (response.data.results || []);
   } catch (error) {
     console.error("Error fetching categories:", error);
   }

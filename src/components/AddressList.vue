@@ -23,16 +23,28 @@
         </div>
       </div>
 
-      <div class="form-group">
-        <label for="phone_number"
-          >{{ $t("address_form.label_phone_number") }} <span class="required">*</span></label
-        >
-        <input
-          type="tel"
-          id="phone_number"
-          v-model="formData.phone_number"
-          required
-        />
+      <div class="form-row">
+        <div class="form-group">
+          <label for="phone_number_1"
+            >{{ $t("address_form.label_phone_number") }} 1 <span class="required">*</span></label
+          >
+          <input
+            type="tel"
+            id="phone_number_1"
+            v-model="formData.phone_number_1"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="phone_number_2"
+            >{{ $t("address_form.label_phone_number") }} 2</label
+          >
+          <input
+            type="tel"
+            id="phone_number_2"
+            v-model="formData.phone_number_2"
+          />
+        </div>
       </div>
 
       <div class="form-group">
@@ -145,7 +157,8 @@ const initialFormData = {
   id: props.initialData?.id || null,
   first_name: props.initialData?.first_name || "",
   last_name: props.initialData?.last_name || "",
-  phone_number: props.initialData?.phone_number || "",
+  phone_number_1: props.initialData?.phone_number_1 || "",
+  phone_number_2: props.initialData?.phone_number_2 || "",
   street_address: props.initialData?.street_address || "",
   apartment_details: props.initialData?.apartment_details || "",
   // IMPORTANT: 'area' must be the Area ID for the backend
@@ -182,12 +195,11 @@ const fetchLocationData = async () => {
   try {
     // Fetch Governorates, including their related areas (if serializer supports nested data)
     const govResponse = await api.get("/governorates/");
-    governorates.value = govResponse.data;
+    governorates.value = Array.isArray(govResponse.data) ? govResponse.data : (govResponse.data.results || []);
 
     // Fetch ALL areas separately (simpler if you have many governorates)
-    // This assumes your backend has an endpoint to list all areas.
-    const areasResponse = await api.get("/areas/"); // Assuming a /areas/ endpoint exists
-    allAreas.value = areasResponse.data;
+    const areasResponse = await api.get("/areas/"); 
+    allAreas.value = Array.isArray(areasResponse.data) ? areasResponse.data : (areasResponse.data.results || []);
   } catch (error) {
     console.error("Failed to fetch location data:", error);
     // 💥 Using translation key here
@@ -213,7 +225,7 @@ const handleSubmit = async () => {
   // 1. Basic Validation (more complex validation should be handled by the backend)
   if (
     !formData.value.first_name ||
-    !formData.value.phone_number ||
+    !formData.value.phone_number_1 ||
     !formData.value.area
   ) {
     // 💥 Using translation key here
@@ -226,7 +238,8 @@ const handleSubmit = async () => {
   const payload = {
     first_name: formData.value.first_name,
     last_name: formData.value.last_name || "",
-    phone_number: formData.value.phone_number,
+    phone_number_1: formData.value.phone_number_1,
+    phone_number_2: formData.value.phone_number_2 || "",
     street_address: formData.value.street_address,
     apartment_details: formData.value.apartment_details || "",
     // Backend expects `area_id` as the write-only PrimaryKeyRelatedField

@@ -48,9 +48,36 @@
           <div class="coupon-code">
             <span>{{ $t("checkout.summary_coupon") }}</span>
             <div class="coupon-input">
-              <input type="text" :placeholder="$t('checkout.coupon_placeholder')" />
-              <button class="apply-btn">{{ $t("checkout.coupon_apply") }}</button>
+              <input 
+                type="text" 
+                v-model="couponCode"
+                :placeholder="$t('checkout.coupon_placeholder')" 
+                :disabled="cartStore.appliedCoupon"
+              />
+              <button 
+                v-if="!cartStore.appliedCoupon"
+                @click="handleApplyCoupon" 
+                class="apply-btn"
+                :disabled="!couponCode"
+              >
+                {{ $t("checkout.coupon_apply") }}
+              </button>
+              <button 
+                v-else
+                @click="cartStore.removeCoupon" 
+                class="remove-coupon-btn"
+              >
+                {{ $t("checkout.remove") || 'Remove' }}
+              </button>
             </div>
+            <p v-if="cartStore.appliedCoupon" class="coupon-success">
+              {{ $t("checkout.coupon_applied") || 'Coupon applied' }}: {{ cartStore.appliedCoupon.code }}
+            </p>
+          </div>
+
+          <div v-if="cartStore.discountAmount > 0" class="summary-item discount">
+            <span>{{ $t("checkout.discount") || 'Discount' }}</span>
+            <span class="price">-{{ cartStore.discountAmount.toFixed(2) }} EGP</span>
           </div>
 
           <div class="summary-item total-price">
@@ -100,6 +127,9 @@ const addressToEdit = ref(null);
 const shippingCost = ref(0.0);
 const isLoading = ref(true);
 
+// Coupon state
+const couponCode = ref("");
+
 // --- COMPUTED ---
 const activeAddress = computed(() => {
   return savedAddresses.value.find((a) => a.id === activeAddressId.value) || null;
@@ -108,7 +138,9 @@ const activeAddress = computed(() => {
 const calculatedTotal = computed(() => {
   const subtotal = parseFloat(cartStore.cartTotal) || 0;
   const cost = parseFloat(shippingCost.value) || 0;
-  return (subtotal + cost).toFixed(2);
+  const discount = parseFloat(cartStore.discountAmount) || 0;
+  const total = subtotal + cost - discount;
+  return (total > 0 ? total : 0).toFixed(2);
 });
 
 // --- API FETCH ---
@@ -116,13 +148,14 @@ const fetchUserAddresses = async () => {
   isLoading.value = true;
   try {
     const response = await api.get("/user/addresses/");
-    const addresses = response.data;
-    savedAddresses.value = addresses;
+    // Support both paginated and non-paginated responses
+    const addresses = response.data && (Array.isArray(response.data) ? response.data : (response.data.results || []));
+    savedAddresses.value = addresses || [];
 
-    if (addresses.length > 0) {
+    if (savedAddresses.value.length > 0) {
       // If addresses exist, hide form and select the first one
       isFormVisible.value = false;
-      setActiveAddressId(addresses[0].id);
+      setActiveAddressId(savedAddresses.value[0].id);
     } else {
       // If no addresses exist, force the form to show
       isFormVisible.value = true;
@@ -148,6 +181,16 @@ const setActiveAddressId = (id) => {
   const address = savedAddresses.value.find((a) => a.id === id);
   if (address && address.area) {
     shippingCost.value = parseFloat(address.area.shipping_cost);
+  }
+};
+
+const handleApplyCoupon = async () => {
+  if (!couponCode.value) return;
+  const result = await cartStore.applyCoupon(couponCode.value);
+  if (result.success) {
+    toast.success(result.message);
+  } else {
+    toast.error(result.message);
   }
 };
 
@@ -310,6 +353,26 @@ h3 {
 
 .go-to-checkout-btn:hover {
   background-color: #1a9c72;
+}
+
+.remove-coupon-btn {
+  padding: 0.5rem 1rem;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.coupon-success {
+  color: #20b486;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.summary-item.discount {
+  color: #e74c3c;
+  font-weight: 500;
 }
 
 .go-to-checkout-btn:disabled {

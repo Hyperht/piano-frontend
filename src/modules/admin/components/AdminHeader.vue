@@ -1,25 +1,7 @@
 <template>
   <v-app-bar elevation="0" height="70" class="border-b px-4" :class="customizer.actTheme === 'darkTheme' ? 'bg-surface' : 'bg-white'">
     
-    <!-- Left: Search Bar -->
-    <div class="d-flex align-center flex-grow-1" style="max-width: 400px;">
-        <v-text-field
-            density="compact"
-            variant="solo"
-            label="Search anything..."
-            hide-details
-            single-line
-            rounded="lg"
-            bg-color="grey-lighten-4"
-            class="search-bar"
-        >
-            <template v-slot:prepend-inner>
-                <i class="fa-solid fa-magnifying-glass text-medium-emphasis mr-2"></i>
-            </template>
-        </v-text-field>
-    </div>
-
-    <v-spacer />
+   <v-spacer />
 
     <!-- Right: Actions -->
     <div class="d-flex align-center gap-3">

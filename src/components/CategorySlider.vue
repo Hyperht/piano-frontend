@@ -20,8 +20,8 @@
             :to="{
               name: 'SubCategoryPage',
               params: {
-                categoryName: subcategory.parent_category.name.toLowerCase(),
-                subCategoryName: subcategory.name.toLowerCase()
+                categoryName: (subcategory?.parent_category?.name || 'all').toLowerCase(),
+                subCategoryName: (subcategory?.name || 'all').toLowerCase()
               }
             }"
             class="category-link"
@@ -75,8 +75,9 @@ const getLocalized = (obj, field) => {
 const fetchSubcategories = async () => {
   try {
     const response = await axios.get(getApiUrl('subcategories/'));
+    const data = Array.isArray(response.data) ? response.data : (response.data.results || []);
     // Map localized fields for name and parent_category.name
-    subcategories.value = response.data.map(sub => ({
+    subcategories.value = data.map(sub => ({
       ...sub,
       name: getLocalized(sub, 'name'),
       parent_category: {

@@ -195,8 +195,9 @@ const fetchFavorites = async () => {
   }
   try {
     const response = await api.get("favorites/");
+    const items = Array.isArray(response.data) ? response.data : (response.data.results || []);
     favoriteProductIds.value = new Set(
-      response.data.map((item) => item.product.id)
+      items.map((item) => item.product.id)
     );
   } catch (error) {
     console.error(
@@ -231,12 +232,14 @@ const fetchProducts = async () => {
     const response = await api.get(props.endpoint);
 
     let fetchedProducts = [];
+    const data = Array.isArray(response.data) ? response.data : (response.data.results || []);
+    
     if (props.endpoint === "favorites/") {
-      fetchedProducts = response.data.map(
+      fetchedProducts = data.map(
         (favoriteItem) => favoriteItem.product
       );
     } else {
-      fetchedProducts = response.data;
+      fetchedProducts = data;
     }
 
     products.value = fetchedProducts.map((product) => ({
