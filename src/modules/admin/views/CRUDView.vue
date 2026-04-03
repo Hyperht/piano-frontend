@@ -533,7 +533,7 @@ const saveItem = async () => {
     }
 
     if (editMode.value && currentItem.value) {
-      await api.put(
+      await api.patch(
         `${tableConfig.value.endpoint}${currentItem.value.id}/`,
         payload,
         hasFileField ? { headers: { 'Content-Type': 'multipart/form-data' } } : {}

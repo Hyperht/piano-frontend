@@ -199,7 +199,15 @@ export const useAdminStore = defineStore('adminCustomizer', () => {
             icon: 'mdiViewCarousel',
             model: 'HeroSlide',
             endpoint: '/dashboard/hero-slides/',
-            fields: ['name', 'title', 'subtitle', { name: 'image', type: 'image' }, 'button_text', { name: 'is_active', type: 'boolean' }, 'order']
+            fields: [
+                'name', 'title', 'subtitle', 
+                { name: 'description', type: 'textarea' },
+                'short_description',
+                { name: 'image', type: 'image' }, 
+                'button_text', 'button_link',
+                { name: 'is_active', type: 'boolean' }, 
+                { name: 'order', type: 'number' }
+            ]
         },
         {
             name: 'Promo Banners',
@@ -220,7 +228,13 @@ export const useAdminStore = defineStore('adminCustomizer', () => {
             icon: 'mdiGrid',
             model: 'PromoGridCategory',
             endpoint: '/dashboard/promo-grid/',
-            fields: ['title', 'subtitle', { name: 'image', type: 'image' }, 'background_color', { name: 'is_active', type: 'boolean' }, 'order']
+            fields: [
+                'title', 'subtitle', 
+                { name: 'image', type: 'image' }, 
+                'background_color', 
+                { name: 'is_active', type: 'boolean' }, 
+                'order'
+            ]
         },
         {
             name: 'Governorates',
@@ -272,7 +286,13 @@ export const useAdminStore = defineStore('adminCustomizer', () => {
             icon: 'mdiImage',
             model: 'ProductImage',
             endpoint: '/dashboard/products/images/',
-            fields: [{ name: 'product', type: 'select', endpoint: '/dashboard/products/' }, { name: 'image', type: 'image' }, { name: 'is_primary', type: 'boolean' }]
+            fields: [
+                { name: 'product', type: 'select', endpoint: '/dashboard/products/' }, 
+                { name: 'image', type: 'image' }, 
+                'alt_text',
+                { name: 'color', type: 'select', endpoint: '/dashboard/colors/' },
+                { name: 'is_primary', type: 'boolean' }
+            ]
         }
     ]);
 
