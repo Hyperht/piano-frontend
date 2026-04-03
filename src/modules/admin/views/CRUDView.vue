@@ -425,6 +425,60 @@ const closeDialog = () => {
   currentItem.value = null;
 };
 
+// Image compression helper
+const compressImage = (file) => {
+  return new Promise((resolve) => {
+    if (!file.type.startsWith('image/')) {
+      resolve(file);
+      return;
+    }
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        const MAX_SIZE = 1200;
+        if (width > height) {
+          if (width > MAX_SIZE) {
+            height = Math.round(height * (MAX_SIZE / width));
+            width = MAX_SIZE;
+          }
+        } else {
+          if (height > MAX_SIZE) {
+            width = Math.round(width * (MAX_SIZE / height));
+            height = MAX_SIZE;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const newName = file.name.replace(/\.[^/.]+$/, "") + ".jpeg";
+            const newFile = new File([blob], newName, {
+              type: 'image/jpeg',
+              lastModified: Date.now()
+            });
+            resolve(newFile);
+          } else {
+            resolve(file);
+          }
+        }, 'image/jpeg', 0.85);
+      };
+      img.onerror = () => resolve(file);
+    };
+    reader.onerror = () => resolve(file);
+  });
+};
+
 // Save item (create or update)
 const saveItem = async () => {
   if (!tableConfig.value) return;
@@ -444,10 +498,18 @@ const saveItem = async () => {
             if (value === null || value === undefined) continue;
 
             if (value instanceof File) {
-                fd.append(key, value);
+                const processedFile = value.type.startsWith('image/') ? await compressImage(value) : value;
+                fd.append(key, processedFile);
             } 
             else if (Array.isArray(value)) {
-                value.forEach(v => fd.append(key, v));
+                for (const v of value) {
+                    if (v instanceof File) {
+                        const processedFile = v.type.startsWith('image/') ? await compressImage(v) : v;
+                        fd.append(key, processedFile);
+                    } else {
+                        fd.append(key, v);
+                    }
+                }
             }
             else if ((typeof value === 'string') && (value.startsWith('http') || value.startsWith('/media'))) {
                 continue;
