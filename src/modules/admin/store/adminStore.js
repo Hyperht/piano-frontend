@@ -199,7 +199,7 @@ export const useAdminStore = defineStore('adminCustomizer', () => {
             icon: 'mdiViewCarousel',
             model: 'HeroSlide',
             endpoint: '/dashboard/hero-slides/',
-            fields: ['name', 'title', 'subtitle', 'image', 'button_text', 'is_active', 'order']
+            fields: ['name', 'title', 'subtitle', { name: 'image', type: 'image' }, 'button_text', { name: 'is_active', type: 'boolean' }, 'order']
         },
         {
             name: 'Promo Banners',
@@ -220,7 +220,7 @@ export const useAdminStore = defineStore('adminCustomizer', () => {
             icon: 'mdiGrid',
             model: 'PromoGridCategory',
             endpoint: '/dashboard/promo-grid/',
-            fields: ['title', 'subtitle', 'image', 'background_color', 'is_active', 'order']
+            fields: ['title', 'subtitle', { name: 'image', type: 'image' }, 'background_color', { name: 'is_active', type: 'boolean' }, 'order']
         },
         {
             name: 'Governorates',
@@ -258,7 +258,7 @@ export const useAdminStore = defineStore('adminCustomizer', () => {
             icon: 'mdiCart',
             model: 'Cart',
             endpoint: '/dashboard/cart/',
-            fields: ['user', 'is_active', 'updated_at']
+            fields: [{ name: 'user', type: 'select', endpoint: '/dashboard/users/' }, { name: 'is_active', type: 'boolean' }, { name: 'updated_at', type: 'datetime' }]
         },
         {
             name: 'Contact Messages',
@@ -272,7 +272,7 @@ export const useAdminStore = defineStore('adminCustomizer', () => {
             icon: 'mdiImage',
             model: 'ProductImage',
             endpoint: '/dashboard/products/images/',
-            fields: ['product', 'image', 'is_primary']
+            fields: [{ name: 'product', type: 'select', endpoint: '/dashboard/products/' }, { name: 'image', type: 'image' }, { name: 'is_primary', type: 'boolean' }]
         }
     ]);
 
