@@ -7,7 +7,7 @@
       >
         <div v-for="(slide, index) in slides" :key="index" class="slide">
           <img 
-            :src="slide.image || fallbackImage" 
+            :src="getImageUrl(slide.image)" 
             :alt="slide.title" 
             @error="e => { e.target.src = fallbackImage; }"
           />
@@ -57,7 +57,7 @@ let intervalId = null;
 
 const fetchSlides = async () => {
   try {
-    const response = await axios.get(getApiUrl('hero-slides/'));
+    const response = await axios.get(getApiUrl('marketing/hero-slides/'));
     slides.value = Array.isArray(response.data) ? response.data : (response.data.results || []);
     if (slides.value.length > 1) startAutoSlide();
   } catch (error) {
@@ -83,6 +83,13 @@ const startAutoSlide = () => {
     // to keep the movement predictable across the screen.
     intervalId = setInterval(nextSlide, 10000); 
   }
+};
+
+const getImageUrl = (imagePath) => {
+  if (!imagePath) return fallbackImage;
+  if (imagePath.startsWith('http') || imagePath.startsWith('data:')) return imagePath;
+  if (!imagePath.startsWith('/')) return `/media/${imagePath}`;
+  return imagePath;
 };
 
 const navigateTo = (url) => url && (window.location.href = url);

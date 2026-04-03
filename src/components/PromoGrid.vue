@@ -3,7 +3,7 @@
     <div class="column">
       <div 
         class="field field-long clickable"
-        :style="{ backgroundImage: sortedPromos[0] ? `url(${sortedPromos[0].image})` : '' }"
+        :style="{ backgroundImage: sortedPromos[0] ? `url(${getImageUrl(sortedPromos[0].image)})` : '' }"
         v-if="sortedPromos[0]"
         @click="handlePromoClick(0)"
       >
@@ -14,7 +14,7 @@
       </div>
       <div 
         class="field field-short clickable"
-        :style="{ backgroundImage: sortedPromos[1] ? `url(${sortedPromos[1].image})` : '' }"
+        :style="{ backgroundImage: sortedPromos[1] ? `url(${getImageUrl(sortedPromos[1].image)})` : '' }"
         v-if="sortedPromos[1]"
         @click="handlePromoClick(1)"
       >
@@ -27,7 +27,7 @@
     <div class="column">
       <div 
         class="field field-short clickable"
-        :style="{ backgroundImage: sortedPromos[2] ? `url(${sortedPromos[2].image})` : '' }"
+        :style="{ backgroundImage: sortedPromos[2] ? `url(${getImageUrl(sortedPromos[2].image)})` : '' }"
         v-if="sortedPromos[2]"
         @click="handlePromoClick(2)"
       >
@@ -38,7 +38,7 @@
       </div>
       <div 
         class="field field-long clickable"
-        :style="{ backgroundImage: sortedPromos[3] ? `url(${sortedPromos[3].image})` : '' }"
+        :style="{ backgroundImage: sortedPromos[3] ? `url(${getImageUrl(sortedPromos[3].image)})` : '' }"
         v-if="sortedPromos[3]"
         @click="handlePromoClick(3)"
       >
@@ -108,9 +108,16 @@ const localizedName = (obj, field = 'title') => {
 
 const localizedSubtitle = (obj) => localizedName(obj, 'subtitle');
 
+const getImageUrl = (imagePath) => {
+  if (!imagePath) return '';
+  if (imagePath.startsWith('http') || imagePath.startsWith('data:')) return imagePath;
+  if (!imagePath.startsWith('/')) return `/media/${imagePath}`;
+  return imagePath;
+};
+
 const fetchPromotions = async () => {
   try {
-    const response = await axios.get(getApiUrl('promo-grid-categories/'));
+    const response = await axios.get(getApiUrl('marketing/promo-grid-categories/'));
     const data = Array.isArray(response.data) ? response.data : (response.data.results || []);
     promotions.value = data.sort((a, b) => a.order - b.order);
     sortedPromos.value = promotions.value.slice(0, 4);
