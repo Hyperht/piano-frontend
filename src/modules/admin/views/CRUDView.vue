@@ -106,13 +106,24 @@
                 ></v-select>
 
                 <!-- File/Image -->
-                <v-file-input
-                   v-else-if="getFieldType(field) === 'image' || getFieldType(field) === 'file'"
-                   v-model="formData[getFieldName(field)]"
-                   :label="formatFieldName(getFieldName(field))"
-                   variant="outlined"
-                   :prepend-icon="mdiCamera"
-                ></v-file-input>
+                <div v-else-if="getFieldType(field) === 'image' || getFieldType(field) === 'file'" class="w-100">
+                   <!-- Show existing image preview if editing and value is a string -->
+                   <div v-if="typeof formData[getFieldName(field)] === 'string' && formData[getFieldName(field)]" class="mb-4 d-flex align-center gap-4">
+                       <v-avatar size="64" rounded class="border">
+                           <v-img :src="getImageUrl(formData[getFieldName(field)])"></v-img>
+                       </v-avatar>
+                       <v-btn size="small" variant="outlined" color="primary" @click="formData[getFieldName(field)] = null">Change Image / File</v-btn>
+                   </div>
+                   <!-- File input for new upload -->
+                   <v-file-input
+                      v-else
+                      v-model="formData[getFieldName(field)]"
+                      :label="formatFieldName(getFieldName(field))"
+                      variant="outlined"
+                      :prepend-icon="mdiCamera"
+                      :accept="getFieldType(field) === 'image' ? 'image/*' : '*/*'"
+                   ></v-file-input>
+                </div>
 
                 <!-- Textarea -->
                 <v-textarea
